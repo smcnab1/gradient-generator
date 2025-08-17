@@ -11,7 +11,7 @@ import {
 import React, { useState } from 'react';
 import PreviewGradient from './preview-gradient';
 import { GradType } from './types';
-import { randomHex, solidColorPngDataUri } from './lib/grad';
+import { randomHex } from './lib/grad';
 
 const isValidHex = (s: string): boolean =>
   /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(s.trim());
