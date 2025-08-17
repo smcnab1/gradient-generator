@@ -44,6 +44,11 @@
 </details>
 
 ## About The Project
+<div align="center">
+  <a href="https://github.com/smcnab1/gradient-generator">
+    <img src="media/gradient-generator-2.png" alt="Screenshot" width="100%" height="auto">
+  </a>
+  </div>
 
 **Gradient Generator** is a minimalist, local-first Raycast extension for crafting gradients. Create a gradient, preview it in a large panel, copy ready-to-use snippets (CSS, SwiftUI, Tailwind arbitrary value), generate random gradients, and save your favorites locally.
 
