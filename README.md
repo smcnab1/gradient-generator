@@ -117,4 +117,16 @@ Contributions welcome. Please open an issue to discuss changes first.
 
 MIT — see [LICENSE](./LICENSE) for details.
 
+<!-- MARKDOWN LINKS & IMAGES -->
 
+[contributors-shield]: https://img.shields.io/github/contributors/smcnab1/gradient-generator.svg?style=for-the-badge
+[contributors-url]: https://github.com/smcnab1/gradient-generator/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/smcnab1/gradient-generator.svg?style=for-the-badge
+[forks-url]: https://github.com/smcnab1/gradient-generator/network/members
+[stars-shield]: https://img.shields.io/github/stars/smcnab1/gradient-generator.svg?style=for-the-badge
+[stars-url]: https://github.com/smcnab1/gradient-generator/stargazers
+[issues-shield]: https://img.shields.io/github/issues/smcnab1/gradient-generator.svg?style=for-the-badge
+[issues-url]: https://github.com/smcnab1/gradient-generator/issues
+[license-shield]: https://img.shields.io/github/license/smcnab1/gradient-generator.svg?style=for-the-badge
+[license-url]: https://github.com/smcnab1/gradient-generator/blob/main/LICENSE
+[product-screenshot]: media/gradient-generator-1.png
