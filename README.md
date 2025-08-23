@@ -2,10 +2,11 @@
 
 <div align="center">
     <img src="media/icon.png" alt="Logo" width="80" height="80" />
-
   <h3 align="center">Gradient Generator</h3>
   <p align="center">
     A Raycast extension to create, preview, randomize, save and export gradients, using them in your next project.
+    <br />
+    <a href="./ROADMAP.md"><strong>Explore the roadmap »</strong></a>
     <br />
   </p>
 </div>
