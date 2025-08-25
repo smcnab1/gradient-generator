@@ -175,12 +175,10 @@ export default function PreviewGradient(props: Props) {
             title="Tailwind Output" 
             text={tailwindMode ? "Utility Classes" : "Raw CSS"}
           />
-          <Detail.Metadata.TagList title="Toggle Mode">
-            <Detail.Metadata.TagList.Item 
-              text={tailwindMode ? "Switch to CSS" : "Switch to Utility"}
-              icon={Icon.ArrowClockwise}
-            />
-          </Detail.Metadata.TagList>
+          <Detail.Metadata.Label 
+            title="Toggle Mode" 
+            text={`Use Cmd+T to switch to ${tailwindMode ? 'Raw CSS' : 'Utility Classes'}`}
+          />
         </Detail.Metadata>
       }
       actions={
