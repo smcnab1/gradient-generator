@@ -44,6 +44,26 @@
       "mode": "view"
     }
   ],
+  "preferences": [
+    {
+      "name": "tailwindOutputMode",
+      "type": "dropdown",
+      "required": false,
+      "title": "Tailwind Output Mode",
+      "description": "Choose default Tailwind output format",
+      "default": "utility",
+      "data": [
+        {
+          "title": "Utility Classes (bg-[...])",
+          "value": "utility"
+        },
+        {
+          "title": "Raw CSS",
+          "value": "css"
+        }
+      ]
+    }
+  ],
   "dependencies": {
     "@raycast/api": "1.102.4",
     "@raycast/utils": "2.2.0",

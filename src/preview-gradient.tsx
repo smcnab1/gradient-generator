@@ -1,6 +1,8 @@
 import {
   Action,
   ActionPanel,
+  Alert,
+  confirmAlert,
   Detail,
   Form,
   Icon,
@@ -8,8 +10,7 @@ import {
   Toast,
   showToast,
   useNavigation,
-  Alert,
-  confirmAlert,
+  getPreferenceValues,
 } from '@raycast/api';
 import { useLocalStorage } from '@raycast/utils';
 import React, { useMemo, useState, useEffect } from 'react';
@@ -28,6 +29,10 @@ type Props = Partial<Gradient> & {
   onGenerateRandom?: (stopCount?: 2 | 3) => void;
 };
 
+type Preferences = {
+  tailwindOutputMode: 'utility' | 'css';
+};
+
 const ensureDefaults = (g?: Props): Gradient => ({
   type: g?.type ?? 'linear',
   angle: g?.angle ?? 90,
@@ -44,11 +49,9 @@ export default function PreviewGradient(props: Props) {
   const initial = ensureDefaults(gradientProps);
   const [gradient, setGradient] = useState<Gradient>(initial);
 
-  // Tailwind output mode toggle state
-  const { value: tailwindMode, setValue: setTailwindMode } = useLocalStorage<boolean>(
-    'tailwind-utility-mode',
-    true
-  );
+  // Get Tailwind output mode from preferences
+  const preferences = getPreferenceValues<Preferences>();
+  const tailwindMode = preferences.tailwindOutputMode === 'utility';
 
   // Sync internal state with props changes
   useEffect(() => {
@@ -74,7 +77,7 @@ export default function PreviewGradient(props: Props) {
   const css = useMemo(() => toCss(gradient), [gradient]);
   const swift = useMemo(() => toSwiftUI(gradient), [gradient]);
   
-  // Tailwind output based on toggle mode
+  // Tailwind output based on preference
   const tailwindOutput = useMemo(() => {
     if (tailwindMode) {
       return toTailwind(gradient);
@@ -175,10 +178,6 @@ export default function PreviewGradient(props: Props) {
             title="Tailwind Output" 
             text={tailwindMode ? "Utility Classes" : "Raw CSS"}
           />
-          <Detail.Metadata.Label 
-            title="Toggle" 
-            text={`Cmd+T to switch`}
-          />
         </Detail.Metadata>
       }
       actions={
@@ -226,12 +225,6 @@ export default function PreviewGradient(props: Props) {
               title="Save Gradient"
               onAction={onSave}
             />
-            <Action
-            icon={Icon.ArrowClockwise}
-            title={`Switch to ${tailwindMode ? 'Raw CSS' : 'Utility Classes'}`}
-            onAction={() => setTailwindMode(!tailwindMode)}
-            shortcut={{ modifiers: ['cmd'], key: 't' } as Keyboard.Shortcut}
-          />
             <Action.Push
               icon={Icon.TextCursor}
               title="Save With Label"
