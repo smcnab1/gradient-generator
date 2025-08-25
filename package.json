@@ -33,7 +33,7 @@
       "name": "random-gradient",
       "title": "Random Gradient",
       "subtitle": "Gradient Generator",
-      "description": "Show a random gradient.",
+      "description": "Show a random gradient with options for 2 or 3 stops.",
       "mode": "view"
     },
     {
