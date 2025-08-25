@@ -83,6 +83,14 @@ export default function CreateGradient() {
     setStops((prev) => prev.map(() => randomHex()));
   };
 
+  const resetToDefaults = () => {
+    setType('linear');
+    setStops(['#FF5733', '#33C1FF']);
+    setAngle('90');
+    setLabel('');
+    setTouchedFields(new Set());
+  };
+
   const applyPreset = (key: string) => {
     if (key in presets) setStops(presets[key]);
   };
@@ -115,6 +123,7 @@ export default function CreateGradient() {
             icon={Icon.Eye}
             title="Preview Gradient"
             onSubmit={handleSubmit}
+            shortcut={{ modifiers: ['cmd'], key: 'enter' }}
           />
           <Action icon={Icon.Plus} title="Add Color Stop" onAction={addStop} />
           <Action
@@ -131,6 +140,11 @@ export default function CreateGradient() {
             icon={Icon.ArrowClockwise}
             title="Randomize Colors"
             onAction={randomize}
+          />
+          <Action
+            icon={Icon.RotateAntiClockwise}
+            title="Reset to Defaults"
+            onAction={resetToDefaults}
           />
           <ActionPanel.Section title="Paste from Clipboard">
             {stops.map((_, i) => (
@@ -154,6 +168,9 @@ export default function CreateGradient() {
       }
     >
       <Form.Description text="Design a gradient quickly with presets, color picker, and clipboard helpers." />
+
+      {/* Keyboard shortcuts info */}
+      <Form.Description text="💡 Tip: Use Cmd+Enter to preview, Tab to navigate between fields" />
 
       {/* Validation Summary - only show when there are touched fields with errors */}
       {touchedFields.size > 0 && !validation.overall.isValid && (
