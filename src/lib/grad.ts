@@ -347,6 +347,69 @@ export const svgMarkup = ({ type, angle, stops }: Gradient): string => {
   return `${svgHead}${defs}${body}</svg>`;
 };
 
+export const toSvg = (
+  { type, angle, stops }: Gradient,
+  width = 800,
+  height = 400,
+  preserveAspectRatio = 'xMidYMid slice',
+): string => {
+  // Validate before processing
+  const validation = validateGradient({ type, angle, stops });
+  if (!validation.overall.isValid) {
+    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#000" /></svg>`;
+  }
+
+  const safeAngle = clampAngle(angle);
+  const safeStops = stops.map(safeParseHex);
+
+  const buildStops = () => {
+    const total = Math.max(2, safeStops.length);
+    return safeStops
+      .map((color, index) => {
+        const offset = (index / (total - 1)) * 100;
+        return `<stop offset='${offset.toFixed(2)}%' stop-color='${color}' />`;
+      })
+      .join('');
+  };
+
+  const svgHead = `<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}' preserveAspectRatio='${preserveAspectRatio}'>`;
+  let defs = '';
+  let body = '';
+
+  if (type === 'linear') {
+    const rotation = safeAngle - 90;
+    defs = `<defs>
+      <linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='0%' gradientUnits='objectBoundingBox' gradientTransform='rotate(${rotation}, 0.5, 0.5)'>
+        ${buildStops()}
+      </linearGradient>
+    </defs>`;
+    body = `<rect width='100%' height='100%' fill='url(#g)' />`;
+  } else if (type === 'radial') {
+    defs = `<defs>
+      <radialGradient id='g' cx='50%' cy='50%' r='75%'>
+        ${buildStops()}
+      </radialGradient>
+    </defs>`;
+    body = `<rect width='100%' height='100%' fill='url(#g)' />`;
+  } else {
+    // Conic: use foreignObject with HTML/CSS conic-gradient for better browser support
+    const fallbackDefs = `<defs>
+      <radialGradient id='fallback' cx='50%' cy='50%' r='75%'>
+        ${buildStops()}
+      </radialGradient>
+    </defs>`;
+    const html = `<foreignObject width='100%' height='100%'>
+      <div xmlns='http://www.w3.org/1999/xhtml' style='width:100%;height:100%;background: conic-gradient(${safeStops.join(
+        ', ',
+      )});'></div>
+    </foreignObject>`;
+    defs = fallbackDefs;
+    body = `<rect width='100%' height='100%' fill='url(#fallback)' />${html}`;
+  }
+
+  return `${svgHead}${defs}${body}</svg>`;
+};
+
 export const randomHex = (): string => {
   const n = Math.floor(Math.random() * 0xffffff);
   const s = n.toString(16).padStart(6, '0');
