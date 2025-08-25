@@ -14,7 +14,7 @@ import {
 } from '@raycast/api';
 import React, { useState } from 'react';
 import { useLocalStorage } from '@raycast/utils';
-import PreviewGradient from './preview-gradient';
+import PreviewGradient from './gradient-preview';
 import { Gradient } from './types';
 import { pngDataUri, toCss, toSwiftUI, toTailwind } from './lib/grad';
 

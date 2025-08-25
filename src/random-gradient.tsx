@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import PreviewGradient from './preview-gradient';
+import PreviewGradient from './gradient-preview';
 import { randomHex } from './lib/grad';
 import { GradType } from './types';
 

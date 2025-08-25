@@ -9,7 +9,7 @@ import {
   useNavigation,
 } from '@raycast/api';
 import React, { useState, useMemo, useCallback } from 'react';
-import PreviewGradient from './preview-gradient';
+import PreviewGradient from './gradient-preview';
 import { GradType, ValidationError } from './types';
 import { randomHex, validateGradient } from './lib/grad';
 

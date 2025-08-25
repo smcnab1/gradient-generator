@@ -23,13 +23,6 @@
       "mode": "view"
     },
     {
-      "name": "preview-gradient",
-      "title": "Preview Gradient",
-      "subtitle": "Gradient Generator",
-      "description": "Preview a gradient with copy actions.",
-      "mode": "view"
-    },
-    {
       "name": "random-gradient",
       "title": "Random Gradient",
       "subtitle": "Gradient Generator",
