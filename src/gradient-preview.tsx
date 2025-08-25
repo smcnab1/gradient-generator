@@ -629,10 +629,10 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
     <Form
       actions={
         <ActionPanel>
-          <Action
+          <Action.SubmitForm
             title="Save SVG with Settings"
             icon={Icon.Download}
-            onAction={handleExport}
+            onSubmit={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
         </ActionPanel>
@@ -745,10 +745,10 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
     <Form
       actions={
         <ActionPanel>
-          <Action
+          <Action.SubmitForm
             title="Export PNG"
             icon={Icon.Download}
-            onAction={handleExport}
+            onSubmit={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
         </ActionPanel>
