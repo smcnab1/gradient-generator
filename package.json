@@ -1,6 +1,6 @@
 {
   "$schema": "https://www.raycast.com/schemas/extension.json",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "gradient-generator",
   "title": "Gradient Generator",
   "description": "Create, preview, randomize, save and export gradients, using them in your next project.",
