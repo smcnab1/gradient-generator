@@ -175,9 +175,9 @@ export default function PreviewGradient(props: Props) {
           <Detail.Metadata.Separator />
           <Detail.Metadata.Label title="Size" text="800 × 480" />
           <Detail.Metadata.Separator />
-          <Detail.Metadata.Label 
-            title="Tailwind Output" 
-            text={tailwindMode ? "Utility Classes" : "Raw CSS"}
+          <Detail.Metadata.Label
+            title="Tailwind Output"
+            text={tailwindMode ? 'Utility Classes' : 'Raw CSS'}
           />
         </Detail.Metadata>
       }
@@ -301,21 +301,30 @@ export default function PreviewGradient(props: Props) {
                     title="Paste CSS"
                     content={css}
                     shortcut={
-                      { modifiers: ['cmd', 'opt'], key: 'c' } as Keyboard.Shortcut
+                      {
+                        modifiers: ['cmd', 'opt'],
+                        key: 'c',
+                      } as Keyboard.Shortcut
                     }
                   />
                   <Action.Paste
                     title="Paste SwiftUI"
                     content={swift}
                     shortcut={
-                      { modifiers: ['cmd', 'opt'], key: 's' } as Keyboard.Shortcut
+                      {
+                        modifiers: ['cmd', 'opt'],
+                        key: 's',
+                      } as Keyboard.Shortcut
                     }
                   />
                   <Action.Paste
                     title="Paste Tailwind"
                     content={tailwindOutput}
                     shortcut={
-                      { modifiers: ['cmd', 'opt'], key: 't' } as Keyboard.Shortcut
+                      {
+                        modifiers: ['cmd', 'opt'],
+                        key: 't',
+                      } as Keyboard.Shortcut
                     }
                   />
                 </ActionPanel.Section>
