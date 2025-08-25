@@ -330,7 +330,7 @@ export default function PreviewGradient(props: Props) {
                     }
                   />
                 </ActionPanel.Section>
-                <ActionPanel.Section title="Export SVG">
+                <ActionPanel.Section title="Export Gradient">
                   <Action.Push
                     icon={Icon.Download}
                     title="Save as SVG..."
@@ -387,8 +387,6 @@ export default function PreviewGradient(props: Props) {
                       />
                     }
                   />
-                </ActionPanel.Section>
-                <ActionPanel.Section title="Export PNG">
                   <Action.Push
                     icon={Icon.Download}
                     title="Save as PNG..."
