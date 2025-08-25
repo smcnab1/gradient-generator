@@ -11,6 +11,7 @@ import {
   showToast,
   useNavigation,
   getPreferenceValues,
+  showHUD,
 } from '@raycast/api';
 import { writeFile, access, mkdir } from 'fs/promises';
 import { join } from 'path';
@@ -333,9 +334,6 @@ export default function PreviewGradient(props: Props) {
                   <Action.Push
                     icon={Icon.Download}
                     title="Save as SVG..."
-                    shortcut={
-                      { modifiers: ['cmd'], key: 'e' } as Keyboard.Shortcut
-                    }
                     target={
                       <SvgExportForm
                         gradient={gradient}
@@ -352,7 +350,7 @@ export default function PreviewGradient(props: Props) {
                               return;
                             }
 
-                            // Show progress toast
+                            // Show progress toast while generating
                             await showToast({
                               style: Toast.Style.Animated,
                               title: 'Generating SVG...',
@@ -378,12 +376,10 @@ export default function PreviewGradient(props: Props) {
 
                             await writeFile(filePath, svgContent, 'utf8');
 
-                            // Show success toast
-                            await showToast({
-                              style: Toast.Style.Success,
-                              title: 'SVG Export Complete',
-                              message: `Saved to ${exportDir}/${filename}`,
-                            });
+                            // Show success HUD
+                            await showHUD(
+                              `SVG saved to ${exportDir}/${filename}`,
+                            );
                           } catch (error) {
                             await showToast({
                               style: Toast.Style.Failure,
@@ -420,7 +416,7 @@ export default function PreviewGradient(props: Props) {
                               return;
                             }
 
-                            // Show progress toast
+                            // Show progress toast while generating
                             await showToast({
                               style: Toast.Style.Animated,
                               title: 'Generating PNG...',
@@ -446,12 +442,10 @@ export default function PreviewGradient(props: Props) {
 
                             await writeFile(filePath, pngBuffer);
 
-                            // Show success toast
-                            await showToast({
-                              style: Toast.Style.Success,
-                              title: 'PNG Export Complete',
-                              message: `Saved to ${exportDir}/${filename}`,
-                            });
+                            // Show success HUD
+                            await showHUD(
+                              `PNG saved to ${exportDir}/${filename}`,
+                            );
                           } catch (error) {
                             await showToast({
                               style: Toast.Style.Failure,
