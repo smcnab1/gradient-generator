@@ -1,28 +1,13 @@
-<!-- TOP ROW OF BADGES -->
-
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![MIT License][license-shield]][license-url]
-
 <a name="readme-top"></a>
 
 <div align="center">
-  <a href="https://github.com/smcnab1/gradient-generator">
     <img src="media/icon.png" alt="Logo" width="80" height="80" />
-  </a>
-
   <h3 align="center">Gradient Generator</h3>
   <p align="center">
     A Raycast extension to create, preview, randomize, save and export gradients, using them in your next project.
     <br />
     <a href="./ROADMAP.md"><strong>Explore the roadmap »</strong></a>
     <br />
-    <br />
-    <a href="https://github.com/smcnab1/gradient-generator/issues/new?template=bug_report.yml">Report Bug</a>
-    ·
-    <a href="https://github.com/smcnab1/gradient-generator/issues/new?template=feature_request.yml">Request Feature</a>
   </p>
 </div>
 
@@ -44,6 +29,9 @@
 </details>
 
 ## About The Project
+<div align="center">
+    <img src="metadata/gradient-generator-2.png" alt="Screenshot" width="100%" height="auto">
+  </div>
 
 **Gradient Generator** is a minimalist, local-first Raycast extension for crafting gradients. Create a gradient, preview it in a large panel, copy ready-to-use snippets (CSS, SwiftUI, Tailwind arbitrary value), generate random gradients, and save your favorites locally.
 
@@ -111,5 +99,3 @@ Contributions welcome. Please open an issue to discuss changes first.
 ### License
 
 MIT — see [LICENSE](./LICENSE) for details.
-
-
