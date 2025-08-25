@@ -39,6 +39,15 @@
   ],
   "preferences": [
     {
+      "name": "svgExportDirectory",
+      "type": "textfield",
+      "required": true,
+      "title": "SVG Export Directory",
+      "description": "Directory where SVG files will be saved (e.g., ~/Downloads, ~/Desktop, or full path)",
+      "default": "~/Downloads",
+      "placeholder": "~/Downloads"
+    },
+    {
       "name": "tailwindOutputMode",
       "type": "dropdown",
       "required": false,

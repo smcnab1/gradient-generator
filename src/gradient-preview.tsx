@@ -13,7 +13,7 @@ import {
   getPreferenceValues,
   showHUD,
 } from '@raycast/api';
-import { writeFile } from 'fs/promises';
+import { writeFile, access, mkdir } from 'fs/promises';
 import { homedir } from 'os';
 import { join } from 'path';
 import { useLocalStorage } from '@raycast/utils';
@@ -35,6 +35,7 @@ type Props = Partial<Gradient> & {
 };
 
 type Preferences = {
+  svgExportDirectory: string;
   tailwindOutputMode: 'utility' | 'css';
 };
 
@@ -327,14 +328,42 @@ export default function PreviewGradient(props: Props) {
                     target={
                       <SvgExportForm
                         gradient={gradient}
+                        preferences={preferences}
                         onExport={async (svgContent, filename) => {
                           try {
-                            // Save to user's Downloads folder by default
-                            const downloadsPath = join(homedir(), 'Downloads');
-                            const filePath = join(downloadsPath, filename);
+                            // Check if export directory preference is set
+                            if (!preferences.svgExportDirectory?.trim()) {
+                              await showToast({
+                                style: Toast.Style.Failure,
+                                title: 'Export Directory Not Set',
+                                message:
+                                  'Please set the SVG Export Directory preference in Raycast settings first.',
+                              });
+                              return;
+                            }
+
+                            // Get export directory from preferences
+                            const exportDir = preferences.svgExportDirectory;
+
+                            // Expand ~ to home directory if present
+                            const expandedPath = exportDir.startsWith('~')
+                              ? join(homedir(), exportDir.slice(1))
+                              : exportDir;
+
+                            // Check if directory exists and is writable, create if needed
+                            try {
+                              await access(expandedPath);
+                            } catch {
+                              // Directory doesn't exist, try to create it
+                              await mkdir(expandedPath, { recursive: true });
+                            }
+
+                            const filePath = join(expandedPath, filename);
 
                             await writeFile(filePath, svgContent, 'utf8');
-                            await showHUD(`SVG saved to Downloads/${filename}`);
+                            await showHUD(
+                              `SVG saved to ${exportDir}/${filename}`,
+                            );
                           } catch (error) {
                             await showToast({
                               style: Toast.Style.Failure,
@@ -475,10 +504,15 @@ function QuickRenameForm({ initialLabel, onSubmit }: QuickRenameFormProps) {
 
 type SvgExportFormProps = {
   gradient: Gradient;
+  preferences: Preferences;
   onExport: (svgContent: string, filename: string) => Promise<void>;
 };
 
-function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
+function SvgExportForm({
+  gradient,
+  preferences,
+  onExport,
+}: SvgExportFormProps) {
   const { pop } = useNavigation();
   const [width, setWidth] = useState<string>('800');
   const [height, setHeight] = useState<string>('400');
@@ -527,7 +561,9 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
         </ActionPanel>
       }
     >
-      <Form.Description text="Configure SVG export settings. The SVG will be saved directly to your Downloads folder with the specified filename." />
+      <Form.Description
+        text={`Configure SVG export settings. The SVG will be saved to your configured export directory (${preferences.svgExportDirectory}) with the specified filename.`}
+      />
 
       <Form.TextField
         id="width"
