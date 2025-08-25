@@ -1,6 +1,8 @@
 import {
   Action,
   ActionPanel,
+  Alert,
+  confirmAlert,
   Detail,
   Form,
   Icon,
@@ -8,8 +10,7 @@ import {
   Toast,
   showToast,
   useNavigation,
-  Alert,
-  confirmAlert,
+  getPreferenceValues,
 } from '@raycast/api';
 import { useLocalStorage } from '@raycast/utils';
 import React, { useMemo, useState, useEffect } from 'react';
@@ -28,6 +29,10 @@ type Props = Partial<Gradient> & {
   onGenerateRandom?: (stopCount?: 2 | 3) => void;
 };
 
+type Preferences = {
+  tailwindOutputMode: 'utility' | 'css';
+};
+
 const ensureDefaults = (g?: Props): Gradient => ({
   type: g?.type ?? 'linear',
   angle: g?.angle ?? 90,
@@ -43,6 +48,10 @@ export default function PreviewGradient(props: Props) {
   } = props;
   const initial = ensureDefaults(gradientProps);
   const [gradient, setGradient] = useState<Gradient>(initial);
+
+  // Get Tailwind output mode from preferences
+  const preferences = getPreferenceValues<Preferences>();
+  const tailwindMode = preferences.tailwindOutputMode === 'utility';
 
   // Sync internal state with props changes
   useEffect(() => {
@@ -67,9 +76,18 @@ export default function PreviewGradient(props: Props) {
   const png = useMemo(() => pngDataUri(gradient, 800, 480), [gradient]);
   const css = useMemo(() => toCss(gradient), [gradient]);
   const swift = useMemo(() => toSwiftUI(gradient), [gradient]);
-  const tw = useMemo(() => toTailwind(gradient), [gradient]);
 
-  const markdown = `# Gradient Preview\n\n![Gradient](${png})\n\n## CSS\n\n\`\`\`css\n${css}\n\`\`\`\n\n## SwiftUI\n\n\`\`\`swift\n${swift}\n\`\`\`\n\n## Tailwind\n\n\`\`\`txt\n${tw}\n\`\`\``;
+  // Tailwind output based on preference
+  const tailwindOutput = useMemo(() => {
+    if (tailwindMode) {
+      return toTailwind(gradient);
+    } else {
+      // Raw CSS output for Tailwind section
+      return toCss(gradient);
+    }
+  }, [gradient, tailwindMode]);
+
+  const markdown = `# Gradient Preview\n\n![Gradient](${png})\n\n## CSS\n\n\`\`\`css\n${css}\n\`\`\`\n\n## SwiftUI\n\n\`\`\`swift\n${swift}\n\`\`\`\n\n## Tailwind\n\n\`\`\`${tailwindMode ? 'txt' : 'css'}\n${tailwindOutput}\n\`\`\``;
 
   const onSave = async () => {
     const next = [...saved, gradient];
@@ -155,6 +173,11 @@ export default function PreviewGradient(props: Props) {
           ) : null}
           <Detail.Metadata.Separator />
           <Detail.Metadata.Label title="Size" text="800 × 480" />
+          <Detail.Metadata.Separator />
+          <Detail.Metadata.Label
+            title="Tailwind Output"
+            text={tailwindMode ? 'Utility Classes' : 'Raw CSS'}
+          />
         </Detail.Metadata>
       }
       actions={
@@ -263,7 +286,7 @@ export default function PreviewGradient(props: Props) {
                   />
                   <Action.CopyToClipboard
                     title="Copy Tailwind"
-                    content={tw}
+                    content={tailwindOutput}
                     shortcut={
                       {
                         modifiers: ['cmd', 'shift'],
@@ -295,7 +318,7 @@ export default function PreviewGradient(props: Props) {
                   />
                   <Action.Paste
                     title="Paste Tailwind"
-                    content={tw}
+                    content={tailwindOutput}
                     shortcut={
                       {
                         modifiers: ['cmd', 'opt'],

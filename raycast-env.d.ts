@@ -7,7 +7,10 @@
 
 /* eslint-disable @typescript-eslint/ban-types */
 
-type ExtensionPreferences = {}
+type ExtensionPreferences = {
+  /** Tailwind Output Mode - Choose default Tailwind output format */
+  "tailwindOutputMode": "utility" | "css"
+}
 
 /** Preferences accessible in all the extension's commands */
 declare type Preferences = ExtensionPreferences
@@ -15,8 +18,6 @@ declare type Preferences = ExtensionPreferences
 declare namespace Preferences {
   /** Preferences accessible in the `create-gradient` command */
   export type CreateGradient = ExtensionPreferences & {}
-  /** Preferences accessible in the `preview-gradient` command */
-  export type PreviewGradient = ExtensionPreferences & {}
   /** Preferences accessible in the `random-gradient` command */
   export type RandomGradient = ExtensionPreferences & {}
   /** Preferences accessible in the `saved-gradients` command */
@@ -26,8 +27,6 @@ declare namespace Preferences {
 declare namespace Arguments {
   /** Arguments passed to the `create-gradient` command */
   export type CreateGradient = {}
-  /** Arguments passed to the `preview-gradient` command */
-  export type PreviewGradient = {}
   /** Arguments passed to the `random-gradient` command */
   export type RandomGradient = {}
   /** Arguments passed to the `saved-gradients` command */
