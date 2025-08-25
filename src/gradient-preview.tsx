@@ -350,14 +350,6 @@ export default function PreviewGradient(props: Props) {
                               return;
                             }
 
-                            // Show progress toast while generating
-                            await showToast({
-                              style: Toast.Style.Animated,
-                              title: 'Generating SVG...',
-                              message:
-                                'Please wait while the file is being created',
-                            });
-
                             // Get export directory from preferences
                             const exportDir = preferences.svgExportDirectory;
 
@@ -415,14 +407,6 @@ export default function PreviewGradient(props: Props) {
                               });
                               return;
                             }
-
-                            // Show progress toast while generating
-                            await showToast({
-                              style: Toast.Style.Animated,
-                              title: 'Generating PNG...',
-                              message:
-                                'Please wait while the image is being created',
-                            });
 
                             // Get export directory from preferences
                             const exportDir = preferences.pngExportDirectory;
@@ -598,6 +582,7 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
   const [filename, setFilename] = useState<string>('gradient.svg');
 
   const handleExport = async () => {
+    // Validate form data
     const numWidth = parseInt(width, 10);
     const numHeight = parseInt(height, 10);
 
@@ -615,12 +600,32 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
       return;
     }
 
+    // Validate filename
+    if (!filename.trim()) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: 'Invalid filename',
+        message: 'Filename cannot be empty',
+      });
+      return;
+    }
+
+    // Generate SVG
     const svgContent = toSvg(
       gradient,
       numWidth,
       numHeight,
       preserveAspectRatio,
     );
+
+    // Show progress toast first, then export
+    await showToast({
+      style: Toast.Style.Animated,
+      title: 'Generating SVG...',
+      message: 'Please wait while the file is being created',
+    });
+
+    // Call export function
     await onExport(svgContent, filename);
     pop();
   };
@@ -629,10 +634,10 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
     <Form
       actions={
         <ActionPanel>
-          <Action.SubmitForm
+          <Action
             title="Save SVG with Settings"
             icon={Icon.Download}
-            onSubmit={handleExport}
+            onAction={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
         </ActionPanel>
@@ -700,6 +705,7 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
   const [filename, setFilename] = useState<string>('gradient.png');
 
   const handleExport = async () => {
+    // Validate form data
     let width: number, height: number;
 
     if (selectedPreset === 'custom') {
@@ -728,7 +734,28 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
       height = preset.height;
     }
 
+    // Validate DPR
     const dprValue = parseInt(dpr, 10);
+    if (isNaN(dprValue) || dprValue <= 0) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: 'Invalid DPR',
+        message: 'Device Pixel Ratio must be a positive number',
+      });
+      return;
+    }
+
+    // Validate filename
+    if (!filename.trim()) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: 'Invalid filename',
+        message: 'Filename cannot be empty',
+      });
+      return;
+    }
+
+    // Generate PNG
     const pngBuffer = generatePng(
       gradient,
       width,
@@ -737,6 +764,14 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
       transparentBackground,
     );
 
+    // Show progress toast first, then export
+    await showToast({
+      style: Toast.Style.Animated,
+      title: 'Generating PNG...',
+      message: 'Please wait while the image is being created',
+    });
+
+    // Call export function
     await onExport(pngBuffer, filename);
     pop();
   };
@@ -745,10 +780,10 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
     <Form
       actions={
         <ActionPanel>
-          <Action.SubmitForm
+          <Action
             title="Export PNG"
             icon={Icon.Download}
-            onSubmit={handleExport}
+            onAction={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
         </ActionPanel>
