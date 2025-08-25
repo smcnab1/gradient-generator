@@ -14,7 +14,6 @@ import {
   showHUD,
 } from '@raycast/api';
 import { writeFile, access, mkdir } from 'fs/promises';
-import { homedir } from 'os';
 import { join } from 'path';
 import { useLocalStorage } from '@raycast/utils';
 import React, { useMemo, useState, useEffect } from 'react';
@@ -328,7 +327,6 @@ export default function PreviewGradient(props: Props) {
                     target={
                       <SvgExportForm
                         gradient={gradient}
-                        preferences={preferences}
                         onExport={async (svgContent, filename) => {
                           try {
                             // Check if export directory preference is set
@@ -345,10 +343,8 @@ export default function PreviewGradient(props: Props) {
                             // Get export directory from preferences
                             const exportDir = preferences.svgExportDirectory;
 
-                            // Expand ~ to home directory if present
-                            const expandedPath = exportDir.startsWith('~')
-                              ? join(homedir(), exportDir.slice(1))
-                              : exportDir;
+                            // The file picker returns a full path, so we can use it directly
+                            const expandedPath = exportDir;
 
                             // Check if directory exists and is writable, create if needed
                             try {
@@ -362,7 +358,7 @@ export default function PreviewGradient(props: Props) {
 
                             await writeFile(filePath, svgContent, 'utf8');
                             await showHUD(
-                              `SVG saved to ${exportDir}/${filename}`,
+                              `SVG saved to ${expandedPath}/${filename}`,
                             );
                           } catch (error) {
                             await showToast({
@@ -504,15 +500,10 @@ function QuickRenameForm({ initialLabel, onSubmit }: QuickRenameFormProps) {
 
 type SvgExportFormProps = {
   gradient: Gradient;
-  preferences: Preferences;
   onExport: (svgContent: string, filename: string) => Promise<void>;
 };
 
-function SvgExportForm({
-  gradient,
-  preferences,
-  onExport,
-}: SvgExportFormProps) {
+function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
   const { pop } = useNavigation();
   const [width, setWidth] = useState<string>('800');
   const [height, setHeight] = useState<string>('400');
@@ -561,9 +552,7 @@ function SvgExportForm({
         </ActionPanel>
       }
     >
-      <Form.Description
-        text={`Configure SVG export settings. The SVG will be saved to your configured export directory (${preferences.svgExportDirectory}) with the specified filename.`}
-      />
+      <Form.Description text="Configure SVG export settings. The SVG will be saved to your configured export directory with the specified filename." />
 
       <Form.TextField
         id="width"
