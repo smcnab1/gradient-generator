@@ -176,8 +176,8 @@ export default function PreviewGradient(props: Props) {
             text={tailwindMode ? "Utility Classes" : "Raw CSS"}
           />
           <Detail.Metadata.Label 
-            title="Toggle Mode" 
-            text={`Use Cmd+T to switch to ${tailwindMode ? 'Raw CSS' : 'Utility Classes'}`}
+            title="Toggle" 
+            text={`Cmd+T to switch`}
           />
         </Detail.Metadata>
       }
