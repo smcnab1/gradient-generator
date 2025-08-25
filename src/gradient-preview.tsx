@@ -11,6 +11,7 @@ import {
   showToast,
   useNavigation,
   getPreferenceValues,
+  showHUD,
 } from '@raycast/api';
 import { useLocalStorage } from '@raycast/utils';
 import React, { useMemo, useState, useEffect } from 'react';
@@ -313,10 +314,10 @@ export default function PreviewGradient(props: Props) {
                     }
                   />
                 </ActionPanel.Section>
-                <ActionPanel.Section title="Export SVG">
+                <ActionPanel.Section title="SVG with Custom Settings">
                   <Action.Push
                     icon={Icon.Download}
-                    title="Save as SVG..."
+                    title="SVG with Custom Settings..."
                     shortcut={
                       { modifiers: ['cmd'], key: 'e' } as Keyboard.Shortcut
                     }
@@ -325,26 +326,16 @@ export default function PreviewGradient(props: Props) {
                         gradient={gradient}
                         onExport={async (svgContent, filename) => {
                           try {
-                            // Create a blob and download it
-                            const blob = new Blob([svgContent], {
-                              type: 'image/svg+xml',
-                            });
-                            const url = URL.createObjectURL(blob);
-                            const a = document.createElement('a');
-                            a.href = url;
-                            a.download = filename;
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
-                            URL.revokeObjectURL(url);
-                            await showToast({
-                              style: Toast.Style.Success,
-                              title: 'SVG saved successfully',
-                            });
+                            // Copy SVG content to clipboard
+                            await showHUD(
+                              `SVG copied to clipboard (${filename})`,
+                            );
+                            // Users can now paste the SVG into any application
+                            // and save it from there (e.g., paste into TextEdit, save as .svg)
                           } catch (error) {
                             await showToast({
                               style: Toast.Style.Failure,
-                              title: 'Failed to save SVG',
+                              title: 'Failed to copy SVG',
                               message:
                                 error instanceof Error
                                   ? error.message
@@ -525,15 +516,15 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
       actions={
         <ActionPanel>
           <Action
-            title="Export SVG"
-            icon={Icon.Download}
+            title="Copy SVG with Settings"
+            icon={Icon.CopyClipboard}
             onAction={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
         </ActionPanel>
       }
     >
-      <Form.Description text="Configure SVG export settings for your gradient." />
+      <Form.Description text="Configure SVG settings. The SVG will be copied to your clipboard for pasting into applications like TextEdit, Figma, or any text editor where you can save it as a .svg file." />
 
       <Form.TextField
         id="width"
