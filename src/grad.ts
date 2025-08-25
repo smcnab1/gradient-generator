@@ -3,7 +3,7 @@ import {
   ValidationError,
   ValidationResult,
   GradientValidation,
-} from '../types';
+} from './types';
 import { PNG } from 'pngjs';
 
 // Validation functions
@@ -42,7 +42,8 @@ export const validateStops = (stops: string[]): ValidationError[] => {
   }
 
   stops.forEach((stop, index) => {
-    if (!isValidHex(stop)) {
+    // Only validate non-empty stops
+    if (stop && stop.trim() && !isValidHex(stop)) {
       errors.push({
         field: `stop-${index}`,
         message: `Invalid hex color: ${stop}`,
@@ -93,6 +94,7 @@ export const validateGradient = (gradient: Gradient): GradientValidation => {
   const stopErrors = validateStops(gradient.stops);
   const angleErrors = validateAngle(gradient.angle);
 
+  // Only show errors for fields that have content but are invalid
   const allErrors = [...stopErrors, ...angleErrors].filter(
     (e) => e.severity === 'error',
   );

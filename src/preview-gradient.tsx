@@ -10,7 +10,7 @@ import {
   useNavigation,
 } from '@raycast/api';
 import { useLocalStorage } from '@raycast/utils';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Gradient } from './types';
 import {
   pngDataUri,
@@ -20,7 +20,11 @@ import {
   randomHex,
 } from './lib/grad';
 
-type Props = Partial<Gradient>;
+type Props = Partial<Gradient> & {
+  additionalActions?: React.ReactNode;
+  isRandomGradient?: boolean;
+  onGenerateRandom?: (stopCount?: 2 | 3) => void;
+};
 
 const ensureDefaults = (g?: Props): Gradient => ({
   type: g?.type ?? 'linear',
@@ -29,8 +33,27 @@ const ensureDefaults = (g?: Props): Gradient => ({
 });
 
 export default function PreviewGradient(props: Props) {
-  const initial = ensureDefaults(props);
+  const {
+    additionalActions,
+    isRandomGradient,
+    onGenerateRandom,
+    ...gradientProps
+  } = props;
+  const initial = ensureDefaults(gradientProps);
   const [gradient, setGradient] = useState<Gradient>(initial);
+
+  // Sync internal state with props changes
+  useEffect(() => {
+    if (
+      gradientProps.type ||
+      gradientProps.angle !== undefined ||
+      gradientProps.stops
+    ) {
+      const newGradient = ensureDefaults(gradientProps);
+      setGradient(newGradient);
+    }
+  }, [gradientProps.type, gradientProps.angle, gradientProps.stops]);
+
   const { value: saved = [], setValue: setSaved } = useLocalStorage<Gradient[]>(
     'saved-gradients',
     [],
@@ -67,7 +90,6 @@ export default function PreviewGradient(props: Props) {
               <Detail.Metadata.TagList.Item text={`${gradient.angle}°`} />
             ) : null}
           </Detail.Metadata.TagList>
-          <Detail.Metadata.Separator />
           <Detail.Metadata.TagList title="Stops">
             {gradient.stops.map((c, idx) => (
               <Detail.Metadata.TagList.Item
@@ -89,6 +111,29 @@ export default function PreviewGradient(props: Props) {
       }
       actions={
         <ActionPanel>
+          {additionalActions}
+          {isRandomGradient && onGenerateRandom && (
+            <ActionPanel.Section title="Generate New Gradient">
+              <Action
+                icon={Icon.ArrowClockwise}
+                title="Random (2 Stops)"
+                onAction={() => onGenerateRandom(2)}
+                shortcut={{ modifiers: ['cmd'], key: '2' } as Keyboard.Shortcut}
+              />
+              <Action
+                icon={Icon.ArrowClockwise}
+                title="Random (3 Stops)"
+                onAction={() => onGenerateRandom(3)}
+                shortcut={{ modifiers: ['cmd'], key: '3' } as Keyboard.Shortcut}
+              />
+              <Action
+                icon={Icon.ArrowClockwise}
+                title="Random (Any)"
+                onAction={() => onGenerateRandom()}
+                shortcut={{ modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut}
+              />
+            </ActionPanel.Section>
+          )}
           <Action
             icon={Icon.Plus}
             title="Add Color Stop"
