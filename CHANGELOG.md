@@ -1,16 +1,19 @@
-# Changelog
+# Gradient Generator Changelog
 
-All notable changes to this project will be documented in this file.
+## [1.1.0] - {PR_MERGE_DATE}
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+- Add ability to copy/save preview as **PNG** with size presets
+- Add ability to copy/save as **SVG** (vector)
+- Add **Tailwind output** toggle for gradient code
+- Add **Quick Rename** command for gradients
+- Streamline preview command architecture to support new features
+- Improve UX with logical tab order, reset action, and better keyboard shortcuts
+- Add comprehensive input validation to prevent crashes from invalid values
+- Remove deprecated `src/preview-gradient.tsx` (replaced by new preview flow)
 
-## [Unreleased]
+## [1.0.0 - Initial Release] - 2025-08-22
 
-### Added
-- (placeholder) Add new entries here for the next release
-
-## [1.0.0] - {PR_MERGE_DATE}
-
-### Added
 - Initial public release of Gradient Generator
+- Create and preview linear and radial gradients
+- Add, remove, and adjust gradient stops with colours and positions
+- Copy CSS snippets directly to clipboard

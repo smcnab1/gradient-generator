@@ -188,11 +188,6 @@ export default function PreviewGradient(props: Props) {
             title="Tailwind Output"
             text={tailwindMode ? 'Utility Classes' : 'Raw CSS'}
           />
-          <Detail.Metadata.Separator />
-          <Detail.Metadata.Label
-            title="SVG Support"
-            text="Linear, Radial, Conic"
-          />
         </Detail.Metadata>
       }
       actions={
@@ -201,6 +196,14 @@ export default function PreviewGradient(props: Props) {
             {additionalActions}
             {isRandomGradient && onGenerateRandom && (
               <ActionPanel.Section title="Generate New Gradient">
+                <Action
+                  icon={Icon.ArrowClockwise}
+                  title="Random (Any)"
+                  onAction={() => onGenerateRandom()}
+                  shortcut={
+                    { modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut
+                  }
+                />
                 <Action
                   icon={Icon.ArrowClockwise}
                   title="Random (2 Stops)"
@@ -215,14 +218,6 @@ export default function PreviewGradient(props: Props) {
                   onAction={() => onGenerateRandom(3)}
                   shortcut={
                     { modifiers: ['cmd'], key: '3' } as Keyboard.Shortcut
-                  }
-                />
-                <Action
-                  icon={Icon.ArrowClockwise}
-                  title="Random (Any)"
-                  onAction={() => onGenerateRandom()}
-                  shortcut={
-                    { modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut
                   }
                 />
               </ActionPanel.Section>
@@ -379,9 +374,6 @@ export default function PreviewGradient(props: Props) {
                   <Action.Push
                     icon={Icon.Download}
                     title="Save as PNG..."
-                    shortcut={
-                      { modifiers: ['cmd'], key: 'p' } as Keyboard.Shortcut
-                    }
                     target={
                       <PngExportForm
                         gradient={gradient}
