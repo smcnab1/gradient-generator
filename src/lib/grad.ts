@@ -596,3 +596,108 @@ export const solidColorPngDataUri = (hex: string, size = 16): string => {
     return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
   }
 };
+
+// Enhanced PNG generation with DPR and transparency support
+export const generatePng = (
+  { type, angle, stops }: Gradient,
+  width: number,
+  height: number,
+  dpr: number = 2,
+  transparentBackground: boolean = false,
+): Buffer => {
+  // Validate before processing
+  const validation = validateGradient({ type, angle, stops });
+  if (!validation.overall.isValid) {
+    // Return a simple black PNG for invalid gradients
+    try {
+      const png = new PNG({ width: width * dpr, height: height * dpr });
+      let ptr = 0;
+      for (let y = 0; y < height * dpr; y++) {
+        for (let x = 0; x < width * dpr; x++) {
+          png.data[ptr++] = 0; // r
+          png.data[ptr++] = 0; // g
+          png.data[ptr++] = 0; // b
+          png.data[ptr++] = transparentBackground ? 0 : 255; // a
+        }
+      }
+      return PNG.sync.write(png);
+    } catch {
+      // Ultimate fallback - return a minimal black PNG
+      return Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+        'base64',
+      );
+    }
+  }
+
+  try {
+    const png = new PNG({ width: width * dpr, height: height * dpr });
+    const cx = (width * dpr - 1) / 2;
+    const cy = (height * dpr - 1) / 2;
+    const safeAngle = clampAngle(angle);
+    const theta = (safeAngle * Math.PI) / 180; // CSS: 0=up
+    const dirX = Math.sin(theta);
+    const dirY = -Math.cos(theta);
+
+    // Precompute projection range for linear
+    const project = (x: number, y: number) => (x - cx) * dirX + (y - cy) * dirY;
+    const corners = [
+      project(0, 0),
+      project(width * dpr - 1, 0),
+      project(0, height * dpr - 1),
+      project(width * dpr - 1, height * dpr - 1),
+    ];
+    const minProj = Math.min(...corners);
+    const maxProj = Math.max(...corners);
+
+    const maxRadius = Math.hypot(
+      Math.max(cx, width * dpr - 1 - cx),
+      Math.max(cy, height * dpr - 1 - cy),
+    );
+
+    let ptr = 0;
+    for (let y = 0; y < height * dpr; y++) {
+      for (let x = 0; x < width * dpr; x++) {
+        let t = 0;
+        if (type === 'linear') {
+          const p = project(x, y);
+          t = (p - minProj) / (maxProj - minProj || 1);
+        } else if (type === 'radial') {
+          const dx = x - cx;
+          const dy = y - cy;
+          t = Math.hypot(dx, dy) / (maxRadius || 1);
+        } else {
+          // conic
+          const dx = x - cx;
+          const dy = y - cy;
+          let ang = Math.atan2(dy, dx); // -PI..PI, 0 at +X (right)
+          // Map CSS 0deg (up) to fraction; rotate by -90deg
+          ang = ang - Math.PI / 2;
+          if (ang < 0) ang += 2 * Math.PI;
+          t = ang / (2 * Math.PI);
+        }
+        t = clamp01(t);
+        const c = interpolateStops(stops, t);
+        png.data[ptr++] = c.r;
+        png.data[ptr++] = c.g;
+        png.data[ptr++] = c.b;
+        png.data[ptr++] = transparentBackground ? 0 : 255; // a
+      }
+    }
+    return PNG.sync.write(png);
+  } catch (error) {
+    // Return fallback PNG on any error
+    return Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      'base64',
+    );
+  }
+};
+
+// Size presets for common use cases
+export const PNG_SIZE_PRESETS = [
+  { name: 'HD (1600×1000)', width: 1600, height: 1000 },
+  { name: 'Full HD (1920×1080)', width: 1920, height: 1080 },
+  { name: '2K (2560×1440)', width: 2560, height: 1440 },
+  { name: '4K (3840×2160)', width: 3840, height: 2160 },
+] as const;

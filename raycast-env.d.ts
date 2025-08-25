@@ -10,6 +10,8 @@
 type ExtensionPreferences = {
   /** SVG Export Directory - Choose the directory where SVG files will be saved */
   "svgExportDirectory": string,
+  /** PNG Export Directory - Choose the directory where PNG files will be saved */
+  "pngExportDirectory": string,
   /** Tailwind Output Mode - Choose default Tailwind output format */
   "tailwindOutputMode": "utility" | "css"
 }

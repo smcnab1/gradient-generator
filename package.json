@@ -47,6 +47,14 @@
       "default": "~/Downloads"
     },
     {
+      "name": "pngExportDirectory",
+      "type": "directory",
+      "required": true,
+      "title": "PNG Export Directory",
+      "description": "Choose the directory where PNG files will be saved",
+      "default": "~/Downloads"
+    },
+    {
       "name": "tailwindOutputMode",
       "type": "dropdown",
       "required": false,
