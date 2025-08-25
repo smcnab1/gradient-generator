@@ -24,6 +24,8 @@ import {
   toSwiftUI,
   toTailwind,
   toSvg,
+  generatePng,
+  PNG_SIZE_PRESETS,
   randomHex,
 } from './lib/grad';
 
@@ -35,6 +37,7 @@ type Props = Partial<Gradient> & {
 
 type Preferences = {
   svgExportDirectory: string;
+  pngExportDirectory: string;
   tailwindOutputMode: 'utility' | 'css';
 };
 
@@ -317,13 +320,10 @@ export default function PreviewGradient(props: Props) {
                     }
                   />
                 </ActionPanel.Section>
-                <ActionPanel.Section title="Export SVG">
+                <ActionPanel.Section title="Export Gradient">
                   <Action.Push
                     icon={Icon.Download}
                     title="Save as SVG..."
-                    shortcut={
-                      { modifiers: ['cmd'], key: 'e' } as Keyboard.Shortcut
-                    }
                     target={
                       <SvgExportForm
                         gradient={gradient}
@@ -357,13 +357,73 @@ export default function PreviewGradient(props: Props) {
                             const filePath = join(expandedPath, filename);
 
                             await writeFile(filePath, svgContent, 'utf8');
+
+                            // Show success HUD
                             await showHUD(
-                              `SVG saved to ${expandedPath}/${filename}`,
+                              `SVG saved to ${exportDir}/${filename}`,
                             );
                           } catch (error) {
                             await showToast({
                               style: Toast.Style.Failure,
                               title: 'Failed to save SVG',
+                              message:
+                                error instanceof Error
+                                  ? error.message
+                                  : 'Unknown error',
+                            });
+                          }
+                        }}
+                      />
+                    }
+                  />
+                  <Action.Push
+                    icon={Icon.Download}
+                    title="Save as PNG..."
+                    shortcut={
+                      { modifiers: ['cmd'], key: 'p' } as Keyboard.Shortcut
+                    }
+                    target={
+                      <PngExportForm
+                        gradient={gradient}
+                        onExport={async (pngBuffer, filename) => {
+                          try {
+                            // Check if export directory preference is set
+                            if (!preferences.pngExportDirectory?.trim()) {
+                              await showToast({
+                                style: Toast.Style.Failure,
+                                title: 'Export Directory Not Set',
+                                message:
+                                  'Please set the PNG Export Directory preference in Raycast settings first.',
+                              });
+                              return;
+                            }
+
+                            // Get export directory from preferences
+                            const exportDir = preferences.pngExportDirectory;
+
+                            // The directory picker returns a full path, so we can use it directly
+                            const expandedPath = exportDir;
+
+                            // Check if directory exists and is writable, create if needed
+                            try {
+                              await access(expandedPath);
+                            } catch {
+                              // Directory doesn't exist, try to create it
+                              await mkdir(expandedPath, { recursive: true });
+                            }
+
+                            const filePath = join(expandedPath, filename);
+
+                            await writeFile(filePath, pngBuffer);
+
+                            // Show success HUD
+                            await showHUD(
+                              `PNG saved to ${exportDir}/${filename}`,
+                            );
+                          } catch (error) {
+                            await showToast({
+                              style: Toast.Style.Failure,
+                              title: 'Failed to save PNG',
                               message:
                                 error instanceof Error
                                   ? error.message
@@ -510,8 +570,10 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
   const [preserveAspectRatio, setPreserveAspectRatio] =
     useState<string>('xMidYMid slice');
   const [filename, setFilename] = useState<string>('gradient.svg');
+  const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const handleExport = async () => {
+    // Validate form data
     const numWidth = parseInt(width, 10);
     const numHeight = parseInt(height, 10);
 
@@ -529,13 +591,38 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
       return;
     }
 
+    // Validate filename
+    if (!filename.trim()) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: 'Invalid filename',
+        message: 'Filename cannot be empty',
+      });
+      return;
+    }
+
+    // Generate SVG
     const svgContent = toSvg(
       gradient,
       numWidth,
       numHeight,
       preserveAspectRatio,
     );
+
+    // Show progress toast first, then export
+    await showToast({
+      style: Toast.Style.Animated,
+      title: 'Generating SVG...',
+      message: 'Please wait while the file is being created',
+    });
+
+    // Set exporting state to show loading
+    setIsExporting(true);
+
+    // Call export function
     await onExport(svgContent, filename);
+
+    // Close form after export completes
     pop();
   };
 
@@ -544,8 +631,8 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
       actions={
         <ActionPanel>
           <Action
-            title="Save SVG with Settings"
-            icon={Icon.Download}
+            title={isExporting ? 'Generating SVG...' : 'Save SVG with Settings'}
+            icon={isExporting ? Icon.Clock : Icon.Download}
             onAction={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
@@ -594,6 +681,180 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
         onChange={setFilename}
         placeholder="gradient.svg"
       />
+
+      {isExporting && (
+        <Form.Description text="🔄 Generating SVG... Please wait while the file is being created." />
+      )}
+    </Form>
+  );
+}
+
+type PngExportFormProps = {
+  gradient: Gradient;
+  onExport: (pngBuffer: Buffer, filename: string) => Promise<void>;
+};
+
+function PngExportForm({ gradient, onExport }: PngExportFormProps) {
+  const { pop } = useNavigation();
+  const [selectedPreset, setSelectedPreset] = useState<string>('1');
+  const [customWidth, setCustomWidth] = useState<string>('1920');
+  const [customHeight, setCustomHeight] = useState<string>('1080');
+  const [dpr, setDpr] = useState<string>('2');
+  const [transparentBackground, setTransparentBackground] =
+    useState<boolean>(false);
+  const [filename, setFilename] = useState<string>('gradient.png');
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+
+  const handleExport = async () => {
+    // Validate form data
+    let width: number, height: number;
+
+    if (selectedPreset === 'custom') {
+      const numWidth = parseInt(customWidth, 10);
+      const numHeight = parseInt(customHeight, 10);
+
+      if (
+        isNaN(numWidth) ||
+        isNaN(numHeight) ||
+        numWidth <= 0 ||
+        numHeight <= 0
+      ) {
+        await showToast({
+          style: Toast.Style.Failure,
+          title: 'Invalid dimensions',
+          message: 'Width and height must be positive numbers',
+        });
+        return;
+      }
+      width = numWidth;
+      height = numHeight;
+    } else {
+      const presetIndex = parseInt(selectedPreset, 10);
+      const preset = PNG_SIZE_PRESETS[presetIndex];
+      width = preset.width;
+      height = preset.height;
+    }
+
+    // Validate DPR
+    const dprValue = parseInt(dpr, 10);
+    if (isNaN(dprValue) || dprValue <= 0) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: 'Invalid DPR',
+        message: 'Device Pixel Ratio must be a positive number',
+      });
+      return;
+    }
+
+    // Validate filename
+    if (!filename.trim()) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: 'Invalid filename',
+        message: 'Filename cannot be empty',
+      });
+      return;
+    }
+
+    // Generate PNG
+    const pngBuffer = generatePng(
+      gradient,
+      width,
+      height,
+      dprValue,
+      transparentBackground,
+    );
+
+    // Set exporting state to show loading
+    setIsExporting(true);
+
+    // Call export function
+    await onExport(pngBuffer, filename);
+
+    // Close form after export completes
+    pop();
+  };
+
+  return (
+    <Form
+      actions={
+        <ActionPanel>
+          <Action
+            title={isExporting ? 'Generating PNG...' : 'Export PNG'}
+            icon={isExporting ? Icon.Clock : Icon.Download}
+            onAction={handleExport}
+          />
+          <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
+        </ActionPanel>
+      }
+    >
+      <Form.Description text="Configure PNG export settings. The PNG will be saved to your configured export directory with the specified filename." />
+
+      <Form.Dropdown
+        id="preset"
+        title="Size Preset"
+        value={selectedPreset}
+        onChange={setSelectedPreset}
+      >
+        {PNG_SIZE_PRESETS.map((preset, index) => (
+          <Form.Dropdown.Item
+            key={index}
+            title={preset.name}
+            value={index.toString()}
+          />
+        ))}
+        <Form.Dropdown.Item value="custom" title="Custom..." />
+      </Form.Dropdown>
+
+      {selectedPreset === 'custom' && (
+        <>
+          <Form.TextField
+            id="customWidth"
+            title="Width"
+            value={customWidth}
+            onChange={setCustomWidth}
+            placeholder="1920"
+          />
+
+          <Form.TextField
+            id="customHeight"
+            title="Height"
+            value={customHeight}
+            onChange={setCustomHeight}
+            placeholder="1080"
+          />
+        </>
+      )}
+
+      <Form.Dropdown
+        id="dpr"
+        title="Device Pixel Ratio (DPR)"
+        value={dpr}
+        onChange={setDpr}
+      >
+        <Form.Dropdown.Item value="1" title="1× (Standard)" />
+        <Form.Dropdown.Item value="2" title="2× (Retina - Default)" />
+      </Form.Dropdown>
+
+      <Form.Checkbox
+        id="transparentBackground"
+        title="Transparent Background"
+        value={transparentBackground}
+        onChange={setTransparentBackground}
+        label="Make background transparent instead of white"
+      />
+
+      <Form.TextField
+        id="filename"
+        title="Filename"
+        value={filename}
+        onChange={setFilename}
+        placeholder="gradient.png"
+      />
+
+      {isExporting && (
+        <Form.Description text="🔄 Generating PNG... Please wait while the image is being created." />
+      )}
     </Form>
   );
 }
