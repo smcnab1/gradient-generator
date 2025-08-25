@@ -580,6 +580,7 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
   const [preserveAspectRatio, setPreserveAspectRatio] =
     useState<string>('xMidYMid slice');
   const [filename, setFilename] = useState<string>('gradient.svg');
+  const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const handleExport = async () => {
     // Validate form data
@@ -625,8 +626,13 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
       message: 'Please wait while the file is being created',
     });
 
+    // Set exporting state to show loading
+    setIsExporting(true);
+
     // Call export function
     await onExport(svgContent, filename);
+
+    // Close form after export completes
     pop();
   };
 
@@ -635,8 +641,8 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
       actions={
         <ActionPanel>
           <Action
-            title="Save SVG with Settings"
-            icon={Icon.Download}
+            title={isExporting ? 'Generating SVG...' : 'Save SVG with Settings'}
+            icon={isExporting ? Icon.Clock : Icon.Download}
             onAction={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
@@ -685,6 +691,10 @@ function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
         onChange={setFilename}
         placeholder="gradient.svg"
       />
+
+      {isExporting && (
+        <Form.Description text="🔄 Generating SVG... Please wait while the file is being created." />
+      )}
     </Form>
   );
 }
@@ -703,6 +713,7 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
   const [transparentBackground, setTransparentBackground] =
     useState<boolean>(false);
   const [filename, setFilename] = useState<string>('gradient.png');
+  const [isExporting, setIsExporting] = useState<boolean>(false);
 
   const handleExport = async () => {
     // Validate form data
@@ -764,15 +775,13 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
       transparentBackground,
     );
 
-    // Show progress toast first, then export
-    await showToast({
-      style: Toast.Style.Animated,
-      title: 'Generating PNG...',
-      message: 'Please wait while the image is being created',
-    });
+    // Set exporting state to show loading
+    setIsExporting(true);
 
     // Call export function
     await onExport(pngBuffer, filename);
+
+    // Close form after export completes
     pop();
   };
 
@@ -781,8 +790,8 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
       actions={
         <ActionPanel>
           <Action
-            title="Export PNG"
-            icon={Icon.Download}
+            title={isExporting ? 'Generating PNG...' : 'Export PNG'}
+            icon={isExporting ? Icon.Clock : Icon.Download}
             onAction={handleExport}
           />
           <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
@@ -852,6 +861,10 @@ function PngExportForm({ gradient, onExport }: PngExportFormProps) {
         onChange={setFilename}
         placeholder="gradient.png"
       />
+
+      {isExporting && (
+        <Form.Description text="🔄 Generating PNG... Please wait while the image is being created." />
+      )}
     </Form>
   );
 }
