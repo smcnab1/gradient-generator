@@ -76,7 +76,7 @@ export default function PreviewGradient(props: Props) {
   const png = useMemo(() => pngDataUri(gradient, 800, 480), [gradient]);
   const css = useMemo(() => toCss(gradient), [gradient]);
   const swift = useMemo(() => toSwiftUI(gradient), [gradient]);
-  
+
   // Tailwind output based on preference
   const tailwindOutput = useMemo(() => {
     if (tailwindMode) {
@@ -174,9 +174,9 @@ export default function PreviewGradient(props: Props) {
           <Detail.Metadata.Separator />
           <Detail.Metadata.Label title="Size" text="800 × 480" />
           <Detail.Metadata.Separator />
-          <Detail.Metadata.Label 
-            title="Tailwind Output" 
-            text={tailwindMode ? "Utility Classes" : "Raw CSS"}
+          <Detail.Metadata.Label
+            title="Tailwind Output"
+            text={tailwindMode ? 'Utility Classes' : 'Raw CSS'}
           />
         </Detail.Metadata>
       }
