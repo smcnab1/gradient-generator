@@ -44,6 +44,12 @@ export default function PreviewGradient(props: Props) {
   const initial = ensureDefaults(gradientProps);
   const [gradient, setGradient] = useState<Gradient>(initial);
 
+  // Tailwind output mode toggle state
+  const { value: tailwindMode, setValue: setTailwindMode } = useLocalStorage<boolean>(
+    'tailwind-utility-mode',
+    true
+  );
+
   // Sync internal state with props changes
   useEffect(() => {
     if (
@@ -67,9 +73,18 @@ export default function PreviewGradient(props: Props) {
   const png = useMemo(() => pngDataUri(gradient, 800, 480), [gradient]);
   const css = useMemo(() => toCss(gradient), [gradient]);
   const swift = useMemo(() => toSwiftUI(gradient), [gradient]);
-  const tw = useMemo(() => toTailwind(gradient), [gradient]);
+  
+  // Tailwind output based on toggle mode
+  const tailwindOutput = useMemo(() => {
+    if (tailwindMode) {
+      return toTailwind(gradient);
+    } else {
+      // Raw CSS output for Tailwind section
+      return toCss(gradient);
+    }
+  }, [gradient, tailwindMode]);
 
-  const markdown = `# Gradient Preview\n\n![Gradient](${png})\n\n## CSS\n\n\`\`\`css\n${css}\n\`\`\`\n\n## SwiftUI\n\n\`\`\`swift\n${swift}\n\`\`\`\n\n## Tailwind\n\n\`\`\`txt\n${tw}\n\`\`\``;
+  const markdown = `# Gradient Preview\n\n![Gradient](${png})\n\n## CSS\n\n\`\`\`css\n${css}\n\`\`\`\n\n## SwiftUI\n\n\`\`\`swift\n${swift}\n\`\`\`\n\n## Tailwind\n\n\`\`\`${tailwindMode ? 'txt' : 'css'}\n${tailwindOutput}\n\`\`\``;
 
   const onSave = async () => {
     const next = [...saved, gradient];
@@ -155,6 +170,17 @@ export default function PreviewGradient(props: Props) {
           ) : null}
           <Detail.Metadata.Separator />
           <Detail.Metadata.Label title="Size" text="800 × 480" />
+          <Detail.Metadata.Separator />
+          <Detail.Metadata.Label 
+            title="Tailwind Output" 
+            text={tailwindMode ? "Utility Classes" : "Raw CSS"}
+          />
+          <Detail.Metadata.TagList title="Toggle Mode">
+            <Detail.Metadata.TagList.Item 
+              text={tailwindMode ? "Switch to CSS" : "Switch to Utility"}
+              icon={Icon.ArrowClockwise}
+            />
+          </Detail.Metadata.TagList>
         </Detail.Metadata>
       }
       actions={
@@ -202,6 +228,12 @@ export default function PreviewGradient(props: Props) {
               title="Save Gradient"
               onAction={onSave}
             />
+            <Action
+            icon={Icon.ArrowClockwise}
+            title={`Switch to ${tailwindMode ? 'Raw CSS' : 'Utility Classes'}`}
+            onAction={() => setTailwindMode(!tailwindMode)}
+            shortcut={{ modifiers: ['cmd'], key: 't' } as Keyboard.Shortcut}
+          />
             <Action.Push
               icon={Icon.TextCursor}
               title="Save With Label"
@@ -263,7 +295,7 @@ export default function PreviewGradient(props: Props) {
                   />
                   <Action.CopyToClipboard
                     title="Copy Tailwind"
-                    content={tw}
+                    content={tailwindOutput}
                     shortcut={
                       {
                         modifiers: ['cmd', 'shift'],
@@ -295,7 +327,7 @@ export default function PreviewGradient(props: Props) {
                   />
                   <Action.Paste
                     title="Paste Tailwind"
-                    content={tw}
+                    content={tailwindOutput}
                     shortcut={
                       {
                         modifiers: ['cmd', 'opt'],
