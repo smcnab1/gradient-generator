@@ -41,7 +41,9 @@ export default function SavedGradients() {
     }
 
     // Check for name collisions
-    const existingIndex = saved.findIndex((g, i) => i !== index && g.label === trimmedLabel);
+    const existingIndex = saved.findIndex(
+      (g, i) => i !== index && g.label === trimmedLabel,
+    );
     if (existingIndex !== -1) {
       const ok = await confirmAlert({
         title: 'Name Already Exists',
@@ -99,7 +101,9 @@ export default function SavedGradients() {
                     <Action.Push
                       title="Quick Rename"
                       icon={Icon.Text}
-                      shortcut={{ modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut}
+                      shortcut={
+                        { modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut
+                      }
                       target={
                         <QuickRenameForm
                           initialLabel={g.label}

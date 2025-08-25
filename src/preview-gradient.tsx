@@ -92,15 +92,18 @@ export default function PreviewGradient(props: Props) {
     }
 
     // Find the gradient in saved list to update it
-    const savedIndex = saved.findIndex((g) => 
-      g.type === gradient.type && 
-      g.angle === gradient.angle && 
-      JSON.stringify(g.stops) === JSON.stringify(gradient.stops)
+    const savedIndex = saved.findIndex(
+      (g) =>
+        g.type === gradient.type &&
+        g.angle === gradient.angle &&
+        JSON.stringify(g.stops) === JSON.stringify(gradient.stops),
     );
 
     if (savedIndex !== -1) {
       // Check for name collisions
-      const existingIndex = saved.findIndex((g, i) => i !== savedIndex && g.label === trimmedLabel);
+      const existingIndex = saved.findIndex(
+        (g, i) => i !== savedIndex && g.label === trimmedLabel,
+      );
       if (existingIndex !== -1) {
         const ok = await confirmAlert({
           title: 'Name Already Exists',
@@ -164,19 +167,25 @@ export default function PreviewGradient(props: Props) {
                   icon={Icon.ArrowClockwise}
                   title="Random (2 Stops)"
                   onAction={() => onGenerateRandom(2)}
-                  shortcut={{ modifiers: ['cmd'], key: '2' } as Keyboard.Shortcut}
+                  shortcut={
+                    { modifiers: ['cmd'], key: '2' } as Keyboard.Shortcut
+                  }
                 />
                 <Action
                   icon={Icon.ArrowClockwise}
                   title="Random (3 Stops)"
                   onAction={() => onGenerateRandom(3)}
-                  shortcut={{ modifiers: ['cmd'], key: '3' } as Keyboard.Shortcut}
+                  shortcut={
+                    { modifiers: ['cmd'], key: '3' } as Keyboard.Shortcut
+                  }
                 />
                 <Action
                   icon={Icon.ArrowClockwise}
                   title="Random (Any)"
                   onAction={() => onGenerateRandom()}
-                  shortcut={{ modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut}
+                  shortcut={
+                    { modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut
+                  }
                 />
               </ActionPanel.Section>
             )}
@@ -188,7 +197,11 @@ export default function PreviewGradient(props: Props) {
                 { modifiers: ['cmd', 'shift'], key: 'n' } as Keyboard.Shortcut
               }
             />
-            <Action icon={Icon.Folder} title="Save Gradient" onAction={onSave} />
+            <Action
+              icon={Icon.Folder}
+              title="Save Gradient"
+              onAction={onSave}
+            />
             <Action.Push
               icon={Icon.TextCursor}
               title="Save With Label"
@@ -207,10 +220,11 @@ export default function PreviewGradient(props: Props) {
                 />
               }
             />
-            {saved.some((g) => 
-              g.type === gradient.type && 
-              g.angle === gradient.angle && 
-              JSON.stringify(g.stops) === JSON.stringify(gradient.stops)
+            {saved.some(
+              (g) =>
+                g.type === gradient.type &&
+                g.angle === gradient.angle &&
+                JSON.stringify(g.stops) === JSON.stringify(gradient.stops),
             ) && (
               <Action.Push
                 icon={Icon.Text}
@@ -263,21 +277,30 @@ export default function PreviewGradient(props: Props) {
                     title="Paste CSS"
                     content={css}
                     shortcut={
-                      { modifiers: ['cmd', 'opt'], key: 'c' } as Keyboard.Shortcut
+                      {
+                        modifiers: ['cmd', 'opt'],
+                        key: 'c',
+                      } as Keyboard.Shortcut
                     }
                   />
                   <Action.Paste
                     title="Paste SwiftUI"
                     content={swift}
                     shortcut={
-                      { modifiers: ['cmd', 'opt'], key: 's' } as Keyboard.Shortcut
+                      {
+                        modifiers: ['cmd', 'opt'],
+                        key: 's',
+                      } as Keyboard.Shortcut
                     }
                   />
                   <Action.Paste
                     title="Paste Tailwind"
                     content={tw}
                     shortcut={
-                      { modifiers: ['cmd', 'opt'], key: 't' } as Keyboard.Shortcut
+                      {
+                        modifiers: ['cmd', 'opt'],
+                        key: 't',
+                      } as Keyboard.Shortcut
                     }
                   />
                 </ActionPanel.Section>
