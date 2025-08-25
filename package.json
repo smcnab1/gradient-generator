@@ -37,6 +37,20 @@
       "mode": "view"
     },
     {
+      "name": "random-gradient-2",
+      "title": "Random Gradient (2 Stops)",
+      "subtitle": "Gradient Generator",
+      "description": "Generate a random gradient with exactly 2 color stops.",
+      "mode": "view"
+    },
+    {
+      "name": "random-gradient-3",
+      "title": "Random Gradient (3 Stops)",
+      "subtitle": "Gradient Generator",
+      "description": "Generate a random gradient with exactly 3 color stops.",
+      "mode": "view"
+    },
+    {
       "name": "saved-gradients",
       "title": "Saved Gradients",
       "subtitle": "Gradient Generator",
