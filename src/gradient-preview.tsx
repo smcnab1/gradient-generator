@@ -319,7 +319,6 @@ export default function PreviewGradient(props: Props) {
                       } as Keyboard.Shortcut
                     }
                   />
-
                 </ActionPanel.Section>
                 <ActionPanel.Section title="Export Gradient">
                   <Action.Push
