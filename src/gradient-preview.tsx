@@ -319,16 +319,7 @@ export default function PreviewGradient(props: Props) {
                       } as Keyboard.Shortcut
                     }
                   />
-                  <Action.CopyToClipboard
-                    title="Copy PNG (Preview)"
-                    content={png}
-                    shortcut={
-                      {
-                        modifiers: ['cmd', 'shift'],
-                        key: 'c',
-                      } as Keyboard.Shortcut
-                    }
-                  />
+
                 </ActionPanel.Section>
                 <ActionPanel.Section title="Export Gradient">
                   <Action.Push
