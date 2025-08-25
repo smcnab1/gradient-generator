@@ -19,10 +19,6 @@ declare namespace Preferences {
   export type PreviewGradient = ExtensionPreferences & {}
   /** Preferences accessible in the `random-gradient` command */
   export type RandomGradient = ExtensionPreferences & {}
-  /** Preferences accessible in the `random-gradient-2` command */
-  export type RandomGradient2 = ExtensionPreferences & {}
-  /** Preferences accessible in the `random-gradient-3` command */
-  export type RandomGradient3 = ExtensionPreferences & {}
   /** Preferences accessible in the `saved-gradients` command */
   export type SavedGradients = ExtensionPreferences & {}
 }
@@ -34,10 +30,6 @@ declare namespace Arguments {
   export type PreviewGradient = {}
   /** Arguments passed to the `random-gradient` command */
   export type RandomGradient = {}
-  /** Arguments passed to the `random-gradient-2` command */
-  export type RandomGradient2 = {}
-  /** Arguments passed to the `random-gradient-3` command */
-  export type RandomGradient3 = {}
   /** Arguments passed to the `saved-gradients` command */
   export type SavedGradients = {}
 }
