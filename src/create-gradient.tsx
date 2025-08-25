@@ -123,7 +123,6 @@ export default function CreateGradient() {
             icon={Icon.Eye}
             title="Preview Gradient"
             onSubmit={handleSubmit}
-            shortcut={{ modifiers: ['cmd'], key: 'enter' }}
           />
           <Action icon={Icon.Plus} title="Add Color Stop" onAction={addStop} />
           <Action
@@ -170,7 +169,7 @@ export default function CreateGradient() {
       <Form.Description text="Design a gradient quickly with presets, color picker, and clipboard helpers." />
 
       {/* Keyboard shortcuts info */}
-      <Form.Description text="💡 Tip: Use Cmd+Enter to preview, Tab to navigate between fields" />
+      <Form.Description text="💡 Tip: Use Tab to navigate between fields, Enter to submit when ready" />
 
       {/* Validation Summary - only show when there are touched fields with errors */}
       {touchedFields.size > 0 && !validation.overall.isValid && (
