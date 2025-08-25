@@ -681,7 +681,12 @@ export const generatePng = (
         png.data[ptr++] = c.r;
         png.data[ptr++] = c.g;
         png.data[ptr++] = c.b;
-        png.data[ptr++] = transparentBackground ? 0 : 255; // a
+        // For transparent background, make pixels with no gradient contribution transparent
+        if (transparentBackground && (t <= 0 || t >= 1)) {
+          png.data[ptr++] = 0; // transparent
+        } else {
+          png.data[ptr++] = 255; // opaque
+        }
       }
     }
     return PNG.sync.write(png);

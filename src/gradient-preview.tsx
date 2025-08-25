@@ -11,7 +11,6 @@ import {
   showToast,
   useNavigation,
   getPreferenceValues,
-  showHUD,
 } from '@raycast/api';
 import { writeFile, access, mkdir } from 'fs/promises';
 import { join } from 'path';
@@ -353,6 +352,14 @@ export default function PreviewGradient(props: Props) {
                               return;
                             }
 
+                            // Show progress toast
+                            await showToast({
+                              style: Toast.Style.Animated,
+                              title: 'Generating SVG...',
+                              message:
+                                'Please wait while the file is being created',
+                            });
+
                             // Get export directory from preferences
                             const exportDir = preferences.svgExportDirectory;
 
@@ -370,9 +377,13 @@ export default function PreviewGradient(props: Props) {
                             const filePath = join(expandedPath, filename);
 
                             await writeFile(filePath, svgContent, 'utf8');
-                            await showHUD(
-                              `SVG saved to ${expandedPath}/${filename}`,
-                            );
+
+                            // Show success toast
+                            await showToast({
+                              style: Toast.Style.Success,
+                              title: 'SVG Export Complete',
+                              message: `Saved to ${exportDir}/${filename}`,
+                            });
                           } catch (error) {
                             await showToast({
                               style: Toast.Style.Failure,
@@ -409,6 +420,14 @@ export default function PreviewGradient(props: Props) {
                               return;
                             }
 
+                            // Show progress toast
+                            await showToast({
+                              style: Toast.Style.Animated,
+                              title: 'Generating PNG...',
+                              message:
+                                'Please wait while the image is being created',
+                            });
+
                             // Get export directory from preferences
                             const exportDir = preferences.pngExportDirectory;
 
@@ -426,9 +445,13 @@ export default function PreviewGradient(props: Props) {
                             const filePath = join(expandedPath, filename);
 
                             await writeFile(filePath, pngBuffer);
-                            await showHUD(
-                              `PNG saved to ${expandedPath}/${filename}`,
-                            );
+
+                            // Show success toast
+                            await showToast({
+                              style: Toast.Style.Success,
+                              title: 'PNG Export Complete',
+                              message: `Saved to ${exportDir}/${filename}`,
+                            });
                           } catch (error) {
                             await showToast({
                               style: Toast.Style.Failure,
