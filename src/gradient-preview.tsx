@@ -36,7 +36,8 @@ type Preferences = {
 const ensureDefaults = (g?: Props): Gradient => ({
   type: g?.type ?? 'linear',
   angle: g?.angle ?? 90,
-  stops: g?.stops && g.stops.length >= 2 ? g.stops : ['#FF5733', '#33C1FF'],
+  stops: g?.stops ?? ['#ff0000', '#00ff00'],
+  label: g?.label,
 });
 
 export default function PreviewGradient(props: Props) {
@@ -174,9 +175,9 @@ export default function PreviewGradient(props: Props) {
           <Detail.Metadata.Separator />
           <Detail.Metadata.Label title="Size" text="800 × 480" />
           <Detail.Metadata.Separator />
-          <Detail.Metadata.Label
-            title="Tailwind Output"
-            text={tailwindMode ? 'Utility Classes' : 'Raw CSS'}
+          <Detail.Metadata.Label 
+            title="Tailwind Output" 
+            text={tailwindMode ? "Utility Classes" : "Raw CSS"}
           />
         </Detail.Metadata>
       }
@@ -300,30 +301,21 @@ export default function PreviewGradient(props: Props) {
                     title="Paste CSS"
                     content={css}
                     shortcut={
-                      {
-                        modifiers: ['cmd', 'opt'],
-                        key: 'c',
-                      } as Keyboard.Shortcut
+                      { modifiers: ['cmd', 'opt'], key: 'c' } as Keyboard.Shortcut
                     }
                   />
                   <Action.Paste
                     title="Paste SwiftUI"
                     content={swift}
                     shortcut={
-                      {
-                        modifiers: ['cmd', 'opt'],
-                        key: 's',
-                      } as Keyboard.Shortcut
+                      { modifiers: ['cmd', 'opt'], key: 's' } as Keyboard.Shortcut
                     }
                   />
                   <Action.Paste
                     title="Paste Tailwind"
                     content={tailwindOutput}
                     shortcut={
-                      {
-                        modifiers: ['cmd', 'opt'],
-                        key: 't',
-                      } as Keyboard.Shortcut
+                      { modifiers: ['cmd', 'opt'], key: 't' } as Keyboard.Shortcut
                     }
                   />
                 </ActionPanel.Section>
@@ -336,10 +328,14 @@ export default function PreviewGradient(props: Props) {
   );
 }
 
-type LabelProps = { initial: Gradient; onSave: (g: Gradient) => Promise<void> };
-function LabelGradient({ initial, onSave }: LabelProps) {
+type LabelGradientProps = {
+  initial: Gradient;
+  onSave: (g: Gradient) => Promise<void>;
+};
+
+function LabelGradient({ initial, onSave }: LabelGradientProps) {
   const { pop } = useNavigation();
-  const [label, setLabel] = useState<string>(initial.label ?? '');
+  const [label, setLabel] = useState<string>('');
   return (
     <Form
       actions={
