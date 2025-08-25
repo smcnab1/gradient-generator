@@ -11,7 +11,10 @@ import {
   showToast,
   useNavigation,
   getPreferenceValues,
+  showHUD,
 } from '@raycast/api';
+import { writeFile, access, mkdir } from 'fs/promises';
+import { join } from 'path';
 import { useLocalStorage } from '@raycast/utils';
 import React, { useMemo, useState, useEffect } from 'react';
 import { Gradient } from './types';
@@ -20,6 +23,7 @@ import {
   toCss,
   toSwiftUI,
   toTailwind,
+  toSvg,
   randomHex,
 } from './lib/grad';
 
@@ -30,6 +34,7 @@ type Props = Partial<Gradient> & {
 };
 
 type Preferences = {
+  svgExportDirectory: string;
   tailwindOutputMode: 'utility' | 'css';
 };
 
@@ -77,6 +82,7 @@ export default function PreviewGradient(props: Props) {
   const png = useMemo(() => pngDataUri(gradient, 800, 480), [gradient]);
   const css = useMemo(() => toCss(gradient), [gradient]);
   const swift = useMemo(() => toSwiftUI(gradient), [gradient]);
+  const svg = useMemo(() => toSvg(gradient, 800, 480), [gradient]);
 
   // Tailwind output based on preference
   const tailwindOutput = useMemo(() => {
@@ -178,6 +184,11 @@ export default function PreviewGradient(props: Props) {
           <Detail.Metadata.Label
             title="Tailwind Output"
             text={tailwindMode ? 'Utility Classes' : 'Raw CSS'}
+          />
+          <Detail.Metadata.Separator />
+          <Detail.Metadata.Label
+            title="SVG Support"
+            text="Linear, Radial, Conic"
           />
         </Detail.Metadata>
       }
@@ -295,6 +306,74 @@ export default function PreviewGradient(props: Props) {
                       } as Keyboard.Shortcut
                     }
                   />
+                  <Action.CopyToClipboard
+                    title="Copy SVG"
+                    content={svg}
+                    shortcut={
+                      {
+                        modifiers: ['cmd', 'shift'],
+                        key: 'v',
+                      } as Keyboard.Shortcut
+                    }
+                  />
+                </ActionPanel.Section>
+                <ActionPanel.Section title="Export SVG">
+                  <Action.Push
+                    icon={Icon.Download}
+                    title="Save as SVG..."
+                    shortcut={
+                      { modifiers: ['cmd'], key: 'e' } as Keyboard.Shortcut
+                    }
+                    target={
+                      <SvgExportForm
+                        gradient={gradient}
+                        onExport={async (svgContent, filename) => {
+                          try {
+                            // Check if export directory preference is set
+                            if (!preferences.svgExportDirectory?.trim()) {
+                              await showToast({
+                                style: Toast.Style.Failure,
+                                title: 'Export Directory Not Set',
+                                message:
+                                  'Please set the SVG Export Directory preference in Raycast settings first.',
+                              });
+                              return;
+                            }
+
+                            // Get export directory from preferences
+                            const exportDir = preferences.svgExportDirectory;
+
+                            // The file picker returns a full path, so we can use it directly
+                            const expandedPath = exportDir;
+
+                            // Check if directory exists and is writable, create if needed
+                            try {
+                              await access(expandedPath);
+                            } catch {
+                              // Directory doesn't exist, try to create it
+                              await mkdir(expandedPath, { recursive: true });
+                            }
+
+                            const filePath = join(expandedPath, filename);
+
+                            await writeFile(filePath, svgContent, 'utf8');
+                            await showHUD(
+                              `SVG saved to ${expandedPath}/${filename}`,
+                            );
+                          } catch (error) {
+                            await showToast({
+                              style: Toast.Style.Failure,
+                              title: 'Failed to save SVG',
+                              message:
+                                error instanceof Error
+                                  ? error.message
+                                  : 'Unknown error',
+                            });
+                          }
+                        }}
+                      />
+                    }
+                  />
                 </ActionPanel.Section>
                 <ActionPanel.Section title="Paste into Active App">
                   <Action.Paste
@@ -324,6 +403,16 @@ export default function PreviewGradient(props: Props) {
                       {
                         modifiers: ['cmd', 'opt'],
                         key: 't',
+                      } as Keyboard.Shortcut
+                    }
+                  />
+                  <Action.Paste
+                    title="Paste SVG"
+                    content={svg}
+                    shortcut={
+                      {
+                        modifiers: ['cmd', 'opt'],
+                        key: 'v',
                       } as Keyboard.Shortcut
                     }
                   />
@@ -404,6 +493,106 @@ function QuickRenameForm({ initialLabel, onSubmit }: QuickRenameFormProps) {
         value={label}
         onChange={setLabel}
         placeholder="e.g. Sunset, Brand Accent"
+      />
+    </Form>
+  );
+}
+
+type SvgExportFormProps = {
+  gradient: Gradient;
+  onExport: (svgContent: string, filename: string) => Promise<void>;
+};
+
+function SvgExportForm({ gradient, onExport }: SvgExportFormProps) {
+  const { pop } = useNavigation();
+  const [width, setWidth] = useState<string>('800');
+  const [height, setHeight] = useState<string>('400');
+  const [preserveAspectRatio, setPreserveAspectRatio] =
+    useState<string>('xMidYMid slice');
+  const [filename, setFilename] = useState<string>('gradient.svg');
+
+  const handleExport = async () => {
+    const numWidth = parseInt(width, 10);
+    const numHeight = parseInt(height, 10);
+
+    if (
+      isNaN(numWidth) ||
+      isNaN(numHeight) ||
+      numWidth <= 0 ||
+      numHeight <= 0
+    ) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: 'Invalid dimensions',
+        message: 'Width and height must be positive numbers',
+      });
+      return;
+    }
+
+    const svgContent = toSvg(
+      gradient,
+      numWidth,
+      numHeight,
+      preserveAspectRatio,
+    );
+    await onExport(svgContent, filename);
+    pop();
+  };
+
+  return (
+    <Form
+      actions={
+        <ActionPanel>
+          <Action
+            title="Save SVG with Settings"
+            icon={Icon.Download}
+            onAction={handleExport}
+          />
+          <Action title="Cancel" icon={Icon.Xmark} onAction={pop} />
+        </ActionPanel>
+      }
+    >
+      <Form.Description text="Configure SVG export settings. The SVG will be saved to your configured export directory with the specified filename." />
+
+      <Form.TextField
+        id="width"
+        title="Width"
+        value={width}
+        onChange={setWidth}
+        placeholder="800"
+      />
+
+      <Form.TextField
+        id="height"
+        title="Height"
+        value={height}
+        onChange={setHeight}
+        placeholder="400"
+      />
+
+      <Form.Dropdown
+        id="preserveAspectRatio"
+        title="Preserve Aspect Ratio"
+        value={preserveAspectRatio}
+        onChange={setPreserveAspectRatio}
+      >
+        <Form.Dropdown.Item
+          value="xMidYMid slice"
+          title="Slice (crop to fit)"
+        />
+        <Form.Dropdown.Item
+          value="xMidYMid meet"
+          title="Meet (fit within bounds)"
+        />
+        <Form.Dropdown.Item value="none" title="None (stretch)" />
+      </Form.Dropdown>
+
+      <Form.TextField
+        id="filename"
+        title="Filename"
+        value={filename}
+        onChange={setFilename}
+        placeholder="gradient.svg"
       />
     </Form>
   );
