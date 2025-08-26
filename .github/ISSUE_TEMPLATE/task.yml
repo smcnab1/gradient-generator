@@ -1,0 +1,63 @@
+name: Task
+description: Track a specific task or sub-task of a milestone
+title: "[Task]: "
+labels: ["task"]
+assignees: []
+
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What needs to be done? Keep it short and actionable.
+      placeholder: e.g. "Add CSS parser to import `linear-gradient(...)` strings"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: milestone
+    attributes:
+      label: Milestone
+      description: Which roadmap version does this task belong to?
+      options:
+        - 1.2.0 — Presets & CSS Import
+        - 1.3.0 — Better Colour Control
+        - 1.4.0 — Animation & Assets
+        - 1.5.0 — Share & Sync
+        - 1.6.0 — Power-User Features
+        - Backlog / Ideas
+    validations:
+      required: false
+
+  - type: textarea
+    id: details
+    attributes:
+      label: Details
+      description: Add more context, notes, or references if needed.
+      placeholder: Steps, design notes, or technical considerations
+    validations:
+      required: false
+
+  - type: textarea
+    id: checklist
+    attributes:
+      label: Checklist
+      description: Break the task into sub-steps if useful.
+      value: |
+        - [ ] Step 1
+        - [ ] Step 2
+        - [ ] Step 3
+    validations:
+      required: false
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      description: How urgent is this task?
+      options:
+        - Low
+        - Medium
+        - High
+    validations:
+      required: false
