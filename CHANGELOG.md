@@ -1,5 +1,8 @@
 # Gradient Generator Changelog
 
+## [1.2.0 - Presets & CSS Import] - {PR_MERGE_DATE}
+- 
+
 ## [1.1.0] - 2025-08-26
 
 - Add ability to copy/save preview as **PNG** with size presets
