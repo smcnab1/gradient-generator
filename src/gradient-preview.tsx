@@ -262,7 +262,9 @@ export default function PreviewGradient(props: Props) {
               <Action.Push
                 icon={Icon.Text}
                 title="Rename Gradient"
-                shortcut={{ modifiers: ['cmd'], key: 'r' } as Keyboard.Shortcut}
+                shortcut={
+                  { modifiers: ['cmd', 'shift'], key: 'r' } as Keyboard.Shortcut
+                }
                 target={
                   <QuickRenameForm
                     initialLabel={gradient.label}
