@@ -347,6 +347,69 @@ export const svgMarkup = ({ type, angle, stops }: Gradient): string => {
   return `${svgHead}${defs}${body}</svg>`;
 };
 
+export const toSvg = (
+  { type, angle, stops }: Gradient,
+  width = 800,
+  height = 400,
+  preserveAspectRatio = 'xMidYMid slice',
+): string => {
+  // Validate before processing
+  const validation = validateGradient({ type, angle, stops });
+  if (!validation.overall.isValid) {
+    return `<svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}"><rect width="100%" height="100%" fill="#000" /></svg>`;
+  }
+
+  const safeAngle = clampAngle(angle);
+  const safeStops = stops.map(safeParseHex);
+
+  const buildStops = () => {
+    const total = Math.max(2, safeStops.length);
+    return safeStops
+      .map((color, index) => {
+        const offset = (index / (total - 1)) * 100;
+        return `<stop offset='${offset.toFixed(2)}%' stop-color='${color}' />`;
+      })
+      .join('');
+  };
+
+  const svgHead = `<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' width='${width}' height='${height}' viewBox='0 0 ${width} ${height}' preserveAspectRatio='${preserveAspectRatio}'>`;
+  let defs = '';
+  let body = '';
+
+  if (type === 'linear') {
+    const rotation = safeAngle - 90;
+    defs = `<defs>
+      <linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='0%' gradientUnits='objectBoundingBox' gradientTransform='rotate(${rotation}, 0.5, 0.5)'>
+        ${buildStops()}
+      </linearGradient>
+    </defs>`;
+    body = `<rect width='100%' height='100%' fill='url(#g)' />`;
+  } else if (type === 'radial') {
+    defs = `<defs>
+      <radialGradient id='g' cx='50%' cy='50%' r='75%'>
+        ${buildStops()}
+      </radialGradient>
+    </defs>`;
+    body = `<rect width='100%' height='100%' fill='url(#g)' />`;
+  } else {
+    // Conic: use foreignObject with HTML/CSS conic-gradient for better browser support
+    const fallbackDefs = `<defs>
+      <radialGradient id='fallback' cx='50%' cy='50%' r='75%'>
+        ${buildStops()}
+      </radialGradient>
+    </defs>`;
+    const html = `<foreignObject width='100%' height='100%'>
+      <div xmlns='http://www.w3.org/1999/xhtml' style='width:100%;height:100%;background: conic-gradient(${safeStops.join(
+        ', ',
+      )});'></div>
+    </foreignObject>`;
+    defs = fallbackDefs;
+    body = `<rect width='100%' height='100%' fill='url(#fallback)' />${html}`;
+  }
+
+  return `${svgHead}${defs}${body}</svg>`;
+};
+
 export const randomHex = (): string => {
   const n = Math.floor(Math.random() * 0xffffff);
   const s = n.toString(16).padStart(6, '0');
@@ -533,3 +596,113 @@ export const solidColorPngDataUri = (hex: string, size = 16): string => {
     return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
   }
 };
+
+// Enhanced PNG generation with DPR and transparency support
+export const generatePng = (
+  { type, angle, stops }: Gradient,
+  width: number,
+  height: number,
+  dpr: number = 2,
+  transparentBackground: boolean = false,
+): Buffer => {
+  // Validate before processing
+  const validation = validateGradient({ type, angle, stops });
+  if (!validation.overall.isValid) {
+    // Return a simple black PNG for invalid gradients
+    try {
+      const png = new PNG({ width: width * dpr, height: height * dpr });
+      let ptr = 0;
+      for (let y = 0; y < height * dpr; y++) {
+        for (let x = 0; x < width * dpr; x++) {
+          png.data[ptr++] = 0; // r
+          png.data[ptr++] = 0; // g
+          png.data[ptr++] = 0; // b
+          png.data[ptr++] = transparentBackground ? 0 : 255; // a
+        }
+      }
+      return PNG.sync.write(png);
+    } catch {
+      // Ultimate fallback - return a minimal black PNG
+      return Buffer.from(
+        'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+        'base64',
+      );
+    }
+  }
+
+  try {
+    const png = new PNG({ width: width * dpr, height: height * dpr });
+    const cx = (width * dpr - 1) / 2;
+    const cy = (height * dpr - 1) / 2;
+    const safeAngle = clampAngle(angle);
+    const theta = (safeAngle * Math.PI) / 180; // CSS: 0=up
+    const dirX = Math.sin(theta);
+    const dirY = -Math.cos(theta);
+
+    // Precompute projection range for linear
+    const project = (x: number, y: number) => (x - cx) * dirX + (y - cy) * dirY;
+    const corners = [
+      project(0, 0),
+      project(width * dpr - 1, 0),
+      project(0, height * dpr - 1),
+      project(width * dpr - 1, height * dpr - 1),
+    ];
+    const minProj = Math.min(...corners);
+    const maxProj = Math.max(...corners);
+
+    const maxRadius = Math.hypot(
+      Math.max(cx, width * dpr - 1 - cx),
+      Math.max(cy, height * dpr - 1 - cy),
+    );
+
+    let ptr = 0;
+    for (let y = 0; y < height * dpr; y++) {
+      for (let x = 0; x < width * dpr; x++) {
+        let t = 0;
+        if (type === 'linear') {
+          const p = project(x, y);
+          t = (p - minProj) / (maxProj - minProj || 1);
+        } else if (type === 'radial') {
+          const dx = x - cx;
+          const dy = y - cy;
+          t = Math.hypot(dx, dy) / (maxRadius || 1);
+        } else {
+          // conic
+          const dx = x - cx;
+          const dy = y - cy;
+          let ang = Math.atan2(dy, dx); // -PI..PI, 0 at +X (right)
+          // Map CSS 0deg (up) to fraction; rotate by -90deg
+          ang = ang - Math.PI / 2;
+          if (ang < 0) ang += 2 * Math.PI;
+          t = ang / (2 * Math.PI);
+        }
+        t = clamp01(t);
+        const c = interpolateStops(stops, t);
+        png.data[ptr++] = c.r;
+        png.data[ptr++] = c.g;
+        png.data[ptr++] = c.b;
+        // For transparent background, make pixels with no gradient contribution transparent
+        if (transparentBackground && (t <= 0 || t >= 1)) {
+          png.data[ptr++] = 0; // transparent
+        } else {
+          png.data[ptr++] = 255; // opaque
+        }
+      }
+    }
+    return PNG.sync.write(png);
+  } catch (error) {
+    // Return fallback PNG on any error
+    return Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==',
+      'base64',
+    );
+  }
+};
+
+// Size presets for common use cases
+export const PNG_SIZE_PRESETS = [
+  { name: 'HD (1600×1000)', width: 1600, height: 1000 },
+  { name: 'Full HD (1920×1080)', width: 1920, height: 1080 },
+  { name: '2K (2560×1440)', width: 2560, height: 1440 },
+  { name: '4K (3840×2160)', width: 3840, height: 2160 },
+] as const;

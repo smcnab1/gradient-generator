@@ -9,12 +9,10 @@ import {
   useNavigation,
 } from '@raycast/api';
 import React, { useState, useMemo, useCallback } from 'react';
-import PreviewGradient from './preview-gradient';
+import PreviewGradient from './gradient-preview';
 import { GradType, ValidationError } from './types';
-import { randomHex, validateGradient } from './lib/grad';
-
-const isValidHex = (s: string): boolean =>
-  /^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(s.trim());
+import { randomHex, validateGradient, isValidHex } from './lib/grad';
+import { getPresets } from './lib/presets';
 
 export default function CreateGradient() {
   const { push } = useNavigation();
@@ -47,13 +45,7 @@ export default function CreateGradient() {
     setTouchedFields((prev) => new Set(prev).add(field));
   }, []);
 
-  const presets: Record<string, string[]> = {
-    Sunset: ['#EE7752', '#E73C7E', '#23A6D5'],
-    Ocean: ['#0B486B', '#F56217'],
-    Forest: ['#5A3F37', '#2C7744'],
-    Aurora: ['#9CECFB', '#65C7F7', '#0052D4'],
-    Candy: ['#FBD3E9', '#BB377D'],
-  };
+  const presets = getPresets();
 
   const setStop = (index: number, value: string) => {
     setStops((prev) => prev.map((c, i) => (i === index ? value : c)));
@@ -91,8 +83,9 @@ export default function CreateGradient() {
     setTouchedFields(new Set());
   };
 
-  const applyPreset = (key: string) => {
-    if (key in presets) setStops(presets[key]);
+  const applyPreset = (presetName: string) => {
+    const preset = presets.find((p) => p.name === presetName);
+    if (preset) setStops(preset.colors);
   };
 
   const handleSubmit = async () => {
@@ -201,11 +194,13 @@ export default function CreateGradient() {
         storeValue
         onChange={applyPreset}
       >
-        <Form.Dropdown.Item value="Sunset" title="Sunset" />
-        <Form.Dropdown.Item value="Ocean" title="Ocean" />
-        <Form.Dropdown.Item value="Forest" title="Forest" />
-        <Form.Dropdown.Item value="Aurora" title="Aurora" />
-        <Form.Dropdown.Item value="Candy" title="Candy" />
+        {presets.map((preset) => (
+          <Form.Dropdown.Item
+            key={preset.name}
+            value={preset.name}
+            title={`${preset.name} - ${preset.description}`}
+          />
+        ))}
       </Form.Dropdown>
       {stops.map((c, i) => {
         const fieldErrors = getFieldErrors(`stop-${i}`);
