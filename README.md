@@ -17,7 +17,7 @@
   <p align="center">
     A Raycast extension to create, preview, randomize, save and export gradients, using them in your next project.
     <br />
-    <a href="https://raycast://extensions/smcnab1/gradient-generator?source=webstore"><strong>Install the extension »</strong></a>
+    <a href="https://www.raycast.com/smcnab1/gradient-generator"><strong>Install the extension »</strong></a>
     <br />
     <br />
     <a href="https://github.com/raycast/extensions/issues/new?title=%5BGradient+Generator%5D+...&template=extension_bug_report.yml&labels=extension%2Cbug&extension-url=https%3A%2F%2Fwww.raycast.com%2Fsmcnab1%2Fgradient-generator&body=%0A%3C%21--%0APlease+update+the+title+above+to+consisely+describe+the+issue%0A--%3E%0A%0A%23%23%23+Extension%0A%0Ahttps%3A%2F%2Fraycast.com%2F%23%7Bextension_path%28extension%29%7D%0A%0A%23%23%23+Description%0A%0A%3C%21--%0APlease+provide+a+clear+and+concise+description+of+what+the+bug+is.+Include+screenshots+if+needed.+Please+test+using+the+latest+version+of+the+extension%2C+Raycast+and+API.%0A--%3E%0A%0A%23%23%23+Steps+To+Reproduce%0A%0A%3C%21--%0AYour+bug+will+get+fixed+much+faster+if+the+extension+author+can+easily+reproduce+it.+Issues+without+reproduction+steps+may+be+immediately+closed+as+not+actionable.%0A--%3E%0A%0A1.+In+this+environment...%0A2.+With+this+config...%0A3.+Run+%27...%27%0A4.+See+error...%0A%0A%23%23%23+Current+Behavior%0A%0A%23%23%23+Expected+Behavior%0A%0A">Report Bug</a>
