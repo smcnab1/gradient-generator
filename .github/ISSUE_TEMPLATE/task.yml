@@ -1,8 +1,8 @@
-name: Task
+name: 📝 Task
 description: Track a specific task or sub-task of a milestone
 title: "[Task]: "
 labels: ["task"]
-assignees: []
+assignees: ["@smcnab1"]
 
 body:
   - type: textarea
