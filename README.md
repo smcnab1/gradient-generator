@@ -1,76 +1,132 @@
-# Gradient Generator
+<!-- TOP ROW OF BADGES -->
 
-A minimalist, local-first Raycast extension for crafting gradients. Create a gradient, preview it in a large panel, copy ready-to-use snippets (CSS, SwiftUI, Tailwind arbitrary value), generate random gradients, save your favorites locally, and export as SVG or PNG files.
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
 
-## Key Features
+<a name="readme-top"></a>
 
-* Create linear, radial, or conic gradients (with angle for linear)
-* Large preview and gradient metadata
-* Copy snippets: CSS, SwiftUI, Tailwind arbitrary value
-* Random gradient generator (2–3 stops)
-* Saved gradients list with quick preview and delete
-* Export gradients as SVG or PNG files with customizable settings
-* Enhanced validation with error checking and warnings
-* Configurable export directories and Tailwind output preferences
-* Local storage only (no network calls)
+<div align="center">
+  <a href="https://www.raycast.com/smcnab1/gradient-generator">
+    <img src="media/icon.png" alt="Logo" width="80" height="80" />
+  </a>
 
-## Commands
+  <h3 align="center">Gradient Generator</h3>
+  <p align="center">
+    A Raycast extension to create, preview, randomize, save and export gradients, using them in your next project.
+    <br />
+    <a href="https://raycast://extensions/smcnab1/gradient-generator?source=webstore"><strong>Install the extension »</strong></a>
+    <br />
+    <br />
+    <a href="https://github.com/raycast/extensions/issues/new?title=%5BGradient+Generator%5D+...&template=extension_bug_report.yml&labels=extension%2Cbug&extension-url=https%3A%2F%2Fwww.raycast.com%2Fsmcnab1%2Fgradient-generator&body=%0A%3C%21--%0APlease+update+the+title+above+to+consisely+describe+the+issue%0A--%3E%0A%0A%23%23%23+Extension%0A%0Ahttps%3A%2F%2Fraycast.com%2F%23%7Bextension_path%28extension%29%7D%0A%0A%23%23%23+Description%0A%0A%3C%21--%0APlease+provide+a+clear+and+concise+description+of+what+the+bug+is.+Include+screenshots+if+needed.+Please+test+using+the+latest+version+of+the+extension%2C+Raycast+and+API.%0A--%3E%0A%0A%23%23%23+Steps+To+Reproduce%0A%0A%3C%21--%0AYour+bug+will+get+fixed+much+faster+if+the+extension+author+can+easily+reproduce+it.+Issues+without+reproduction+steps+may+be+immediately+closed+as+not+actionable.%0A--%3E%0A%0A1.+In+this+environment...%0A2.+With+this+config...%0A3.+Run+%27...%27%0A4.+See+error...%0A%0A%23%23%23+Current+Behavior%0A%0A%23%23%23+Expected+Behavior%0A%0A">Report Bug</a>
+    ·
+    <a href="https://github.com/raycast/extensions/issues/new?title=%5BGradient+Generator%5D+...&template=extension_feature_request.yml&labels=extension%2Cfeature%2Brequest&extension-url=https%3A%2F%2Fwww.raycast.com%2Fsmcnab1%2Fgradient-generator&body=%0A%3C%21--%0APlease+update+the+title+above+to+consisely+describe+the+issue%0A--%3E%0A%0A%23%23%23+Extension%0A%0A%23%7Brepository_url%28extension.latest_version%29%7D%0A%0A%23%23%23+Description%0A%0A%3C%21--%0ADescribe+the+feature+and+the+current+behavior%2Fstate.%0A--%3E%0A%0A%23%23%23+Who+will+benefit+from+this+feature%3F%0A%0A%23%23%23+Anything+else%3F%0A%0A%3C%21--%0ALinks%3F+References%3F+Anything+that+will+give+us+more+context%21%0ATip%3A+You+can+attach+images+or+log+files+by+clicking+this+area+to+highlight+it+and+then+dragging+files+in.%0A--%3E%0A%0A">Request Feature</a>
+  </p>
+</div>
 
-* **Create Gradient**: Form to define type, colors, and angle; pushes to Preview
-* **Random Gradient**: Generates a random 2–3 stop gradient and shows Preview
-* **Saved Gradients**: List of saved gradients with color tags; open Preview; rename labels (Quick Rename or Edit Label); delete
+<details>
+  <summary>Table of Contents</summary>
 
-## Preferences
+- [About The Project](#about-the-project)
+  - [Features](#features)
+  - [Built With](#built-with)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Install](#install)
+  - [Usage](#usage)
+- [Back Matter](#back-matter)
+  - [Roadmap](#roadmap)
+  - [Contributing](#contributing)
+  - [License](#license)
 
-* **SVG Export Directory**: Choose where SVG files are saved (default: ~/Downloads)
-* **PNG Export Directory**: Choose where PNG files are saved (default: ~/Downloads)
-* **Tailwind Output Mode**: Choose between utility classes (bg-[...]) or raw CSS output
+</details>
 
-## Export Features
+## About The Project
+<div align="center">
+  <a href="https://www.raycast.com/smcnab1/gradient-generator">
+    <img src="metadata/gradient-generator-2.png" alt="Screenshot" width="100%" height="auto">
+  </a>
+  </div>
 
-* **SVG Export**: Save gradients as scalable vector graphics with customizable dimensions
-* **PNG Export**: Export as high-quality PNG images with multiple size presets (HD, Full HD, 2K, 4K)
+**Gradient Generator** is a minimalist, local-first Raycast extension for crafting gradients. Create a gradient, preview it in a large panel, copy ready-to-use snippets (CSS, SwiftUI, Tailwind arbitrary value), generate random gradients, and save your favorites locally.
 
-## Frequently Asked Questions
+### Features
 
-**Do I need an internet connection?**
+- Create linear, radial, or conic gradients (with angle for linear)
+- Large preview and gradient metadata
+- Copy snippets: CSS, SwiftUI, Tailwind arbitrary value
+- Random gradient generator (2–3 stops, now with explicit control over stop count)
+- Saved gradients list with quick preview, inline rename (`⌘R`), and delete
+- Export gradients as PNG (copy to clipboard or save at preset/custom sizes, with optional transparency)
+- Export gradients as scalable SVG markup (ideal for Figma, web, or design workflows)
+- Tailwind export mode toggle (switch between arbitrary class or plain CSS)
+- Local storage only (no network calls)
+- Improved form ergonomics: better tab order, conditional angle field, and reset action
+- Validation hardening: no crashes from invalid stops or colour input
 
-No. The extension works completely offline with no network calls required.
+### Built With
 
-**Can I export my gradients?**
+- TypeScript + React
+- `@raycast/api`, `@raycast/utils`
 
-Yes. You can copy CSS, SwiftUI, and Tailwind snippets directly from the preview panel, or export as SVG/PNG files to your chosen directory.
+## Getting started
 
-**Are my saved gradients synced?**
+### Prerequisites
 
-All gradients are stored locally in Raycast's storage. They're not synced across devices right now.
+- macOS with Raycast installed
 
-**How does the random generator work?**
+### Install
 
-It creates gradients with 2–3 color stops using random colors and positions, perfect for inspiration and quick mockups.
+#### From Raycast Store (production):
+Install via [Raycast Store](https://www.raycast.com/smcnab1/gradient-generator)
 
-**What export formats are supported?**
+#### From source (development):
 
-SVG (scalable vector) and PNG (raster) formats are supported. PNG exports include multiple size presets and optional transparency.
+```bash
+npm install
+npm run dev
+```
 
-## Troubleshooting
+Build locally:
 
-**I can't see my saved gradients.**
+```bash
+npm run build
+```
 
-Make sure you've actually saved gradients using the save button in the preview panel. Check that the filter isn't set incorrectly.
+### Commands
 
-**The preview isn't showing.**
+- **Create Gradient** — form to define type, colours, and angle; pushes to Preview
+- **Random Gradient** — generates a random 2–3 stop gradient (user can now choose stop count) and shows Preview
+- **Saved Gradients** — list of saved gradients with colour tags; inline rename (`⌘R`); open Preview; delete
 
-Try refreshing the extension or restarting Raycast. The preview requires the gradient data to be properly formatted.
+## Back Matter
 
-**Copy actions aren't working.**
+### Contributing
 
-Ensure you're using the latest version of Raycast. The copy functionality depends on Raycast's clipboard API.
+Contributions welcome. Please open an issue to discuss changes first.
 
-**Export isn't working.**
+1. Fork the project
+2. Create a feature branch (`git checkout -b feature/my-change`)
+3. Commit your changes (`git commit -m 'feat: ...'`)
+4. Push to your branch (`git push origin feature/my-change`)
+5. Open a Pull Request
 
-Make sure you've set the export directory preferences in Raycast settings. The extension needs to know where to save your exported files.
+### License
 
-**Validation errors appear.**
+MIT — see [LICENSE](./LICENSE) for details.
 
-The extension now includes enhanced validation. Check that your hex colors are valid (e.g., #ff0000) and that you have at least 2 color stops.
+<!-- MARKDOWN LINKS & IMAGES -->
+
+[contributors-shield]: https://img.shields.io/github/contributors/smcnab1/gradient-generator.svg?style=for-the-badge
+[contributors-url]: https://github.com/smcnab1/gradient-generator/graphs/contributors
+[forks-shield]: https://img.shields.io/github/forks/smcnab1/gradient-generator.svg?style=for-the-badge
+[forks-url]: https://github.com/smcnab1/gradient-generator/network/members
+[stars-shield]: https://img.shields.io/github/stars/smcnab1/gradient-generator.svg?style=for-the-badge
+[stars-url]: https://github.com/smcnab1/gradient-generator/stargazers
+[issues-shield]: https://img.shields.io/github/issues/smcnab1/gradient-generator.svg?style=for-the-badge
+[issues-url]: https://github.com/smcnab1/gradient-generator/issues
+[license-shield]: https://img.shields.io/github/license/smcnab1/gradient-generator.svg?style=for-the-badge
+[license-url]: https://github.com/smcnab1/gradient-generator/blob/main/LICENSE
+[product-screenshot]: media/gradient-generator-1.png
