@@ -50,7 +50,7 @@
   </a>
   </div>
 
-**Gradient Generator** is a minimalist, local-first Raycast extension for crafting gradients. Create a gradient, preview it in a large panel, copy ready-to-use snippets (CSS, SwiftUI, Tailwind arbitrary value), generate random gradients, and save your favorites locally.
+**Gradient Generator** is a minimalist, local-first [Raycast extension](https://github.com/raycast/extensions) for crafting gradients. Create a gradient, preview it in a large panel, copy ready-to-use snippets (CSS, SwiftUI, Tailwind arbitrary value), generate random gradients, and save your favorites locally.
 
 ### Features
 
