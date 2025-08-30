@@ -1,8 +1,8 @@
-name: Sync raycast-live → main
+name: Sync raycast-extension → main
 
 on:
   push:
-    branches: [raycast-live]
+    branches: [raycast-extension]
   workflow_dispatch:
 
 permissions:
@@ -19,10 +19,10 @@ jobs:
           ref: main
           fetch-depth: 0
 
-      - name: Checkout raycast-live
+      - name: Checkout raycast-extension
         uses: actions/checkout@v4
         with:
-          ref: raycast-live
+          ref: raycast-extension
           path: raycast-src
           fetch-depth: 0
 
@@ -84,7 +84,7 @@ jobs:
             echo "EOF" >> $GITHUB_OUTPUT
 
             git add -A
-            git commit -m "chore(sync): update selected files from raycast-live"
+            git commit -m "chore(sync): update selected files from raycast-extension"
             git push origin main
           else
             echo "changed=false" >> $GITHUB_OUTPUT
@@ -94,7 +94,7 @@ jobs:
         if: always()
         run: |
           {
-            echo "## 🔄 Sync raycast-live → main"
+            echo "## 🔄 Sync raycast-extension → main"
             echo ""
             echo "- **Source branch:** \`raycast-live\`"
             echo "- **Target branch:** \`main\`"
