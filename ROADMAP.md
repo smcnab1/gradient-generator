@@ -5,7 +5,7 @@ Timelines are indicative and may shift based on feedback and usage.
 
 ---
 
-## 1.2.0 — Presets & CSS Import
+## Unreleased proposal — Presets & CSS Import
 - 🎨 Gradient preset packs (Sunset / Ocean / Pastel / Material)
 - 📥 Import from CSS: parse `linear-gradient(...)`, `radial-gradient(...)`, `conic-gradient(...)`
 - 🔎 Preset browser with preview chips + “Apply” / “Duplicate”
@@ -55,6 +55,15 @@ Timelines are indicative and may shift based on feedback and usage.
 ---
 
 ## ✅ Released
+
+### v1.2.0 — Preview, Library & Export Reliability (2026-11-04)
+- Local PNG preview references prevent render timeouts.
+- Labels, repeated saves, replacement confirmation and stale-edit checks preserve saved data.
+- PNG/SVG exports validate sizes and filenames, stage writes and retain failed forms for retry.
+- Rectangular gradient geometry, conic orientation and self-contained SwiftUI output are corrected.
+- Tailwind preferences are consistent. Unsupported conic SVG substitution and misleading transparency controls are removed.
+- The accepted Raycast PR #33066 is the shipped scope. The retained `release/v1.2.0` branch and its earlier Presets & CSS Import proposal remain historical work; CSS import, custom stop positions and recent-colour history are not shipped in this release.
+
 
 ### v1.1.0 — Image Export & Tailwind Mode
 - 🖼️ PNG export: copy or save at preset/custom sizes (1×/2× DPR, transparency)  
