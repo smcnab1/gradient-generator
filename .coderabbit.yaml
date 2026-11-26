@@ -18,3 +18,5 @@ reviews:
   path_instructions:
     - path: "src/**"
       instructions: "Compare preview and export geometry, including non-square images. Check saved gradient and file recovery against AGENTS.md."
+    - path: ".github/workflows/**"
+      instructions: "Keep the extension checks and macOS SwiftUI output validation effective."
