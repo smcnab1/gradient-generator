@@ -1,113 +1,20 @@
-name: Sync raycast-extension → main
+name: Review historical Raycast branch differences
 
 on:
-  push:
-    branches: [raycast-extension]
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  sync:
+  compare:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout main
-        uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
-          ref: main
           fetch-depth: 0
-
-      - name: Checkout raycast-extension
-        uses: actions/checkout@v4
-        with:
-          ref: raycast-extension
-          path: raycast-src
-          fetch-depth: 0
-
-      - name: Configure Git author
+          persist-credentials: false
+      - name: Report differences without changing main
         run: |
-          git config user.name  "smcnab1"
-          git config user.email "108990188+smcnab1@users.noreply.github.com"
-
-      # Ensure the source checkout dir is never staged
-      - name: Ignore raycast-src folder (local exclude)
-        run: echo "raycast-src/" >> .git/info/exclude
-
-      - name: Sync selected files
-        run: |
-          set -euo pipefail
-          FILES=(
-            "assets"
-            "media"
-            "metadata"
-            ".gitignore"
-            ".prettierrc"
-            ".eslintrc.cjs"
-            "CHANGELOG.md"
-            "LICENSE"
-            "package-lock.json"
-            "package.json"
-            "raycast-env.d.ts"
-            "tsconfig.json"
-            "src"
-          )
-
-          for p in "${FILES[@]}"; do
-            src="raycast-src/$p"
-            if [ -e "$src" ]; then
-              if [ -d "$src" ]; then
-                rsync -a --delete --mkpath "$src/" "./$p/"
-              else
-                mkdir -p "$(dirname "./$p")"
-                rsync -a --mkpath "$src" "./$p"
-              fi
-            else
-              echo "Skip (not present in source): $p"
-            fi
-          done
-
-      # Extra safety: remove the source folder before we stage/commit
-      - name: Clean up source folder
-        run: rm -rf raycast-src
-
-      - name: Commit & push to main (if changes)
-        id: commit
-        run: |
-          if ! git diff --quiet; then
-            # capture list of changed files for summary
-            git status --porcelain | awk '{print $2}' > /tmp/changed_files.txt
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "files<<EOF" >> $GITHUB_OUTPUT
-            cat /tmp/changed_files.txt >> $GITHUB_OUTPUT
-            echo "EOF" >> $GITHUB_OUTPUT
-
-            git add -A
-            git commit -m "chore(sync): update selected files from raycast-extension"
-            git push origin main
-          else
-            echo "changed=false" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Add workflow summary
-        if: always()
-        run: |
-          {
-            echo "## 🔄 Sync raycast-extension → main"
-            echo ""
-            echo "- **Source branch:** \`raycast-live\`"
-            echo "- **Target branch:** \`main\`"
-            echo "- **Triggered by:** ${{ github.event_name }} @ ${{ github.actor }}"
-            echo "- **Commit pushed:** ${{ steps.commit.outputs.changed }}"
-            echo ""
-            if [ "${{ steps.commit.outputs.changed }}" = "true" ]; then
-              echo "### ✅ Files updated"
-              echo ""
-              while IFS= read -r f; do
-                [ -n "$f" ] && echo "- \`$f\`"
-              done <<< "${{ steps.commit.outputs.files }}"
-            else
-              echo "ℹ️ No changes to sync."
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+          git diff --stat origin/main origin/raycast-extension
+          echo 'Historical comparison only. Reconcile accepted upstream files using RELEASE_CHECKLIST.md; this workflow never pushes.'
